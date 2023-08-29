@@ -15,7 +15,7 @@
   "rules": {
     "no-trailing-spaces": "error",
     "comma-dangle": ["error", "always-multiline"],
-    "indent": ["error", 4],
+    "indent": ["error", 2],
     "react/self-closing-comp": "error",
     "eol-last": "error",
     "quotes": ["error", "single", { "avoidEscape": true }]
