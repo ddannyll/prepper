@@ -74,11 +74,11 @@ interface ReadingWordsProps {
 }
 function ReadingWords({ className, words, wordsReadIndex }: ReadingWordsProps) {
   const wordElements = words.map((word, index) => {
-    let colorClasses = "text-gray-500";
+    let colorClasses = "text-gray-500 transition";
     if (wordsReadIndex == index) {
       colorClasses = "text-violet-500";
     } else if (wordsReadIndex > index) {
-      colorClasses = "text-gray-800";
+      colorClasses = "text-gray-800 transition";
     }
     return (
       <span key={index} className={`text-2xl font-semibold ${colorClasses}`}>
