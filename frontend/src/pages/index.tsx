@@ -1,9 +1,13 @@
-import AnswerInput from '@/components/AnswerInput'
+import AnswerControls from '@/components/AnswerControls'
+import Keyboard from '@/components/Keyboard'
 import QuestionCard from '@/components/QuestionCard'
 import { Box, Group, Stack} from '@mantine/core'
+import { useState } from 'react'
 
 
 export default function Home() {
+  const [ keyboardOn , setKeyboardOn] = useState(false)
+
   return  <Stack
     justify='space-between'
     align='stretch'
@@ -19,10 +23,14 @@ export default function Home() {
       promptReadIndex={2}
       tags={['background']} questionNum={2}
     />
-    <Group
-      position='center'
-    >
-      <AnswerInput />
-    </Group>
+    <div className='flex flex-col items-center justify-end gap-8'>
+      <div className="max-w-lg w-full px-2 grow-0">
+        <Keyboard className={!keyboardOn ? 'opacity-0 transition' : 'transition'}/>
+      </div>
+      <AnswerControls
+        onKeyboardClick={() => setKeyboardOn(!keyboardOn)}
+        keyboardOn={keyboardOn}
+      />
+    </div>
   </Stack>
 }
