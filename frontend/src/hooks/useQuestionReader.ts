@@ -21,11 +21,9 @@ export function useQuestionReader({question}: useQuestionReaderArgs) {
 
   useEffect(() => {
     if (!reading || currWordIndex > questionWords.length - 1) {
-      console.log('return')
       return
     }
     const timeout = setTimeout(() => setCurrWordIndex(prev => prev + 1), 100)
-    console.log('settimeut')
     return () => clearTimeout(timeout)
   }, [reading, currWordIndex, questionWords.length])
 
