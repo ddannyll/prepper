@@ -1,0 +1,108 @@
+definitions:
+  UserCredentials:
+    properties:
+      password:
+        example: daniel321
+        minLength: 6
+        type: string
+      username:
+        example: daniel
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  UserSigninResponse:
+    properties:
+      id:
+        example: "1337"
+        type: string
+    type: object
+info:
+  contact: {}
+  description: Backend API sepcifications for prepper
+  title: prepper API
+  version: "0.1"
+paths:
+  /ping:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Ping the server
+      tags:
+      - ping
+  /user/healthcheck:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'if signed in `{"success": true}`'
+        "401":
+          description: if not signed in
+      summary: Check if a user is signed in
+      tags:
+      - user
+  /user/signin:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Password must be atleast 6 characters.
+        in: body
+        name: SignInBody
+        required: true
+        schema:
+          $ref: '#/definitions/UserCredentials'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/UserSigninResponse'
+        "401":
+          description: Invalid Credentials
+      summary: Sign a user into dancord
+      tags:
+      - user
+  /user/signout:
+    post:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: on successful signout
+      summary: Sign a user out of dancord
+      tags:
+      - user
+  /user/signup:
+    post:
+      consumes:
+      - application/json
+      description: Insert description here
+      parameters:
+      - description: Password must be atleast 6 characters.
+        in: body
+        name: SignUpBody
+        required: true
+        schema:
+          $ref: '#/definitions/UserCredentials'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/UserSigninResponse'
+      summary: Sign a user up to dancord
+      tags:
+      - user
+swagger: "2.0"
