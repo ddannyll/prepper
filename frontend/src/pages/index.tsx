@@ -1,20 +1,28 @@
+import AnswerInput from '@/components/AnswerInput'
 import QuestionCard from '@/components/QuestionCard'
-import { Box, Paper, createStyles } from '@mantine/core'
+import { Box, Group, Stack} from '@mantine/core'
 
 
 export default function Home() {
-  return <Box
+  return  <Stack
+    justify='space-between'
+    align='stretch'
     sx={theme => ({
       backgroundColor: theme.colors.gray[0],
       height: '100vh',
     })}
+    py="xl"
   >
     <QuestionCard
-      questionNum={2}
       totalQuestionNum={5}
       prompt={'Tell me about yourself.'.split(' ')}
       promptReadIndex={2}
-      tags={['background']}
+      tags={['background']} questionNum={2}
     />
-  </Box>
+    <Group
+      position='center'
+    >
+      <AnswerInput />
+    </Group>
+  </Stack>
 }
