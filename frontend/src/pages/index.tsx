@@ -4,7 +4,6 @@ import QuestionCard from "@/components/QuestionCard";
 import useQuestionPlayer, { Question } from "@/hooks/useQuestionPlayer";
 import { useQuestionReader } from "@/hooks/useQuestionReader";
 import { MockQuestionFetcher } from "@/service/questionFetcher";
-import { Box, Group, Stack } from "@mantine/core";
 import { useEffect, useState } from "react";
 
 const questionService = new MockQuestionFetcher();
@@ -33,16 +32,9 @@ export default function Home() {
   }
 
   return (
-    <Stack
-      justify="space-between"
-      align="stretch"
-      sx={(theme) => ({
-        backgroundColor: theme.colors.gray[0],
-        height: "100vh",
-      })}
-      py="xl"
-    >
+    <div className="bg-gray-50 h-screen flex flex-col justify-between py-8">
       <QuestionCard
+        className="mx-auto"
         totalQuestionNum={totalQuestionNum}
         prompt={currQuestion.questionPrompt.split(" ")}
         promptReadIndex={currWordIndex}
@@ -61,6 +53,6 @@ export default function Home() {
           keyboardOn={keyboardOn}
         />
       </div>
-    </Stack>
+    </div>
   );
 }

@@ -11,6 +11,7 @@
     "prettier"
   ],
   "rules": {
+    "indent": ["error", 2],
     "react/self-closing-comp": "error"
   }
 }
