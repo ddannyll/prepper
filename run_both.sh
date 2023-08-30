@@ -7,7 +7,10 @@ if ! command -v nodemon &> /dev/null; then
 fi
 
 cd backend
-# go run . &
+
+# --- Perform database migration ---
+go run github.com/steebchen/prisma-client-go db push
+
 nodemon -e go --signal SIGTERM --exec 'go' run . &
 
 cd ../frontend
