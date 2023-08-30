@@ -1,7 +1,6 @@
 package dbconnection
 
 import (
-	"errors"
 	"log"
 
 	"github.com/ddannyll/prepper/db"
@@ -25,9 +24,9 @@ func setupDatabase() (*db.PrismaClient, error) {
 	return client, nil
 }
 
-func GetDBClient() (*db.PrismaClient, error) {
+func GetDBClient() *db.PrismaClient {
 	if cachedDBClient != nil {
-		return cachedDBClient, nil
+		return cachedDBClient
 	}
 
 	client, err := setupDatabase()
@@ -36,8 +35,9 @@ func GetDBClient() (*db.PrismaClient, error) {
 
 	if err == nil {
 		cachedDBClient = client
-		return cachedDBClient, nil
+		return cachedDBClient
 	}
 
-	return nil, errors.New("failed to establish database connection")
+	panic(err)
+
 }
