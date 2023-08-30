@@ -8,6 +8,7 @@ fi
 
 cd backend
 
+
 # --- Perform database migration ---
 go run github.com/steebchen/prisma-client-go db push
 
