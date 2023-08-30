@@ -24,7 +24,7 @@ export default function AnswerControls({keyboardOn=false, onKeyboardClick, onSub
 interface IconButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode
   className?: string
-  active: boolean
+  active?: boolean
 }
 function IconButton({children, className, active, ...props}: IconButtonProps) {
   const activeClasses = active ? 'bg-blue-50' : ''
