@@ -42,7 +42,7 @@ export default function Home() {
         questionNum={currQuestionNum}
       />
       <div className="flex flex-col items-center justify-end gap-8">
-        <div className="max-w-lg w-full px-2 grow-0">
+        <div className="max-w-lg w-full px-6 grow-0">
           <Keyboard
             className={!keyboardOn ? "opacity-0 transition" : "transition"}
           />

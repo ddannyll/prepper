@@ -3,6 +3,7 @@ import {
   IconKeyboard,
   IconMicrophone,
 } from "@tabler/icons-react";
+import IconButton from "./IconButton";
 
 interface AnswerControlsProps {
   onSubmitClick?: () => void;
@@ -31,28 +32,3 @@ export default function AnswerControls({
   );
 }
 
-interface IconButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  children: React.ReactNode;
-  className?: string;
-  active?: boolean;
-}
-function IconButton({
-  children,
-  className,
-  active,
-  ...props
-}: IconButtonProps) {
-  const activeClasses = active ? "bg-blue-50" : "";
-  return (
-    <button
-      {...props}
-      className={`${className} flex justify-center p-2 px-5 
-      bg-white text-blue-500 transition
-      hover:bg-blue-50  active:translate-y-0.5 active:bg-blue-100
-      ${activeClasses}`}
-    >
-      {children}
-    </button>
-  );
-}
