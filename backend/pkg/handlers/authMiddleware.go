@@ -15,6 +15,7 @@ func NewAuthMiddleware(store *session.Store) *AuthMiddleware {
 
 func (a *AuthMiddleware) AuthenticateRoute(c *fiber.Ctx) error {
 	sess, err := a.Store.Get(c)
+
 	if err != nil {
 		return c.Status(fiber.StatusUnauthorized).SendString("not authorized")
 	}

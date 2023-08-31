@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/ddannyll/prepper/db"
 	"github.com/ddannyll/prepper/pkg/config"
@@ -157,10 +158,18 @@ func (u *UserHandler) SignOutUser(c *fiber.Ctx) error {
 //	@Failure	401	"if not signed in"
 //	@Router		/user/healthcheck [get]
 func (u *UserHandler) HealthCheckUser(c *fiber.Ctx) error {
+
 	sess, err := u.SessionStore.Get(c)
 	if err != nil || sess.Get("auth") != true {
 		return fiber.NewError(fiber.StatusUnauthorized, "unauthorized")
 	}
+
+	// TODO - abstract the user_id into a helper function
+	// There is repeated code everywhere -> could we possibly inject the user details into the context?
+	// After it has been passed to the auth middleware?
+
+	log.Println(sess.Get("user_id"))
+
 	return c.JSON(fiber.Map{"success": true})
 }
 
