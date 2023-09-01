@@ -1,23 +1,17 @@
 {
   "parser": "@typescript-eslint/parser",
-  "plugins": [
-    "@typescript-eslint",
-    "react"
-  ],
+  "plugins": ["@typescript-eslint", "react"],
   "extends": [
     "next/core-web-vitals",
     "eslint:recommended",
     "plugin:@typescript-eslint/eslint-recommended",
     "plugin:@typescript-eslint/recommended",
     "plugin:react/jsx-runtime",
-    "plugin:react-hooks/recommended"
+    "plugin:react-hooks/recommended",
+    "prettier"
   ],
   "rules": {
-    "no-trailing-spaces": "error",
-    "comma-dangle": ["error", "always-multiline"],
     "indent": ["error", 2],
-    "react/self-closing-comp": "error",
-    "eol-last": "error",
-    "quotes": ["error", "single", { "avoidEscape": true }]
+    "react/self-closing-comp": "error"
   }
 }
