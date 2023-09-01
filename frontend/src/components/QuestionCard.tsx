@@ -1,4 +1,5 @@
 import { IconQuote } from "@tabler/icons-react";
+import Badge from "./Badge";
 
 interface QuestionCardProps {
   questionNum: number;
@@ -86,19 +87,6 @@ export function QuestionCardMainSection({
   );
 }
 
-interface BadgeProps {
-  className?: string;
-  children: React.ReactNode;
-}
-function Badge({ children, className }: BadgeProps) {
-  return (
-    <span
-      className={`rounded-full py-0.5 px-2.5 text-xs bg-blue-100 text-blue-500 tracking-wide font-semibold uppercase ${className}`}
-    >
-      {children}
-    </span>
-  );
-}
 
 interface ReadingWordsProps {
   words: string[];
