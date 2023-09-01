@@ -9,11 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@emotion/react": "^11.11.1",
-    "@emotion/server": "^11.11.0",
-    "@mantine/core": "^6.0.19",
-    "@mantine/hooks": "^6.0.19",
-    "@mantine/next": "^6.0.19",
+    "@headlessui/react": "^1.7.17",
     "@tabler/icons-react": "^2.32.0",
     "@types/node": "20.5.7",
     "@types/react": "18.2.21",
@@ -30,6 +26,7 @@
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^6.5.0",
-    "@typescript-eslint/parser": "^6.5.0"
+    "@typescript-eslint/parser": "^6.5.0",
+    "eslint-config-prettier": "^9.0.0"
   }
 }
