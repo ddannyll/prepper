@@ -82,7 +82,7 @@ func (u *UserHandler) SignUpUser(c *fiber.Ctx) error {
 
 // Signin godoc
 //
-//	@Summary	Sign a user into dancord
+//	@Summary	Sign a user
 //	@description
 //	@Tags		user
 //	@Accept		json
@@ -124,7 +124,7 @@ func (u *UserHandler) SignInUser(c *fiber.Ctx) error {
 	})
 }
 
-// Signin godoc
+// SignOut godoc
 //
 //	@Summary	Sign a user out of dancord
 //	@description
@@ -148,7 +148,7 @@ func (u *UserHandler) SignOutUser(c *fiber.Ctx) error {
 	})
 }
 
-// Signin godoc
+// HealthCheck godoc
 //
 //	@Summary	Check if a user is signed in
 //	@description

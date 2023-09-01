@@ -112,7 +112,6 @@ func analyseResponse(ctx context.Context, c aigateway.AIGatewayServiceClient, r 
 	}
 	fmt.Println(resp.Raw)
 
-	resp.
 	return resp.Raw
 }
 

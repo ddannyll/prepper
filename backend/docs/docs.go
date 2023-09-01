@@ -54,6 +54,59 @@ const docTemplate = `{
                 }
             }
         },
+        "/application/create": {
+            "post": {
+                "description": "an application has some properties",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "application"
+                ],
+                "summary": "Create an application for the user",
+                "parameters": [
+                    {
+                        "description": "Application",
+                        "name": "ApplicationCreateBody",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/ApplicationCreateBody"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ApplicationCreateResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/application/me": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "application"
+                ],
+                "summary": "Get user's applications",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                }
+            }
+        },
         "/ping": {
             "get": {
                 "consumes": [
@@ -106,7 +159,7 @@ const docTemplate = `{
                 "tags": [
                     "user"
                 ],
-                "summary": "Sign a user into dancord",
+                "summary": "Sign a user",
                 "parameters": [
                     {
                         "description": "Password must be atleast 6 characters.",
@@ -183,6 +236,61 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "ApplicationCreateBody": {
+            "type": "object",
+            "required": [
+                "jobDescription",
+                "name"
+            ],
+            "properties": {
+                "description": {
+                    "type": "string",
+                    "example": "SafetyCulture is an Australian-based global technology company that specialises in building inspection apps for the web and mobile devices."
+                },
+                "icon": {
+                    "description": "icon link?",
+                    "type": "string",
+                    "example": "https://www.safetyculture.com/wp-content/uploads/2020/10/safetyculture-logo.svg"
+                },
+                "jobDescription": {
+                    "type": "string",
+                    "example": "Looking for an engineer to join our team."
+                },
+                "name": {
+                    "type": "string",
+                    "example": "SafetyCulture"
+                }
+            }
+        },
+        "ApplicationCreateResponse": {
+            "type": "object",
+            "required": [
+                "jobDescription",
+                "name"
+            ],
+            "properties": {
+                "description": {
+                    "type": "string",
+                    "example": "SafetyCulture is an Australian-based global technology company that specialises in building inspection apps for the web and mobile devices."
+                },
+                "icon": {
+                    "type": "string",
+                    "example": "https://www.safetyculture.com/wp-content/uploads/2020/10/safetyculture-logo.svg"
+                },
+                "id": {
+                    "type": "string",
+                    "example": "1337"
+                },
+                "jobDescription": {
+                    "type": "string",
+                    "example": "Looking for an engineer to join our team."
+                },
+                "name": {
+                    "type": "string",
+                    "example": "SafetyCulture"
+                }
+            }
+        },
         "UserCredentials": {
             "type": "object",
             "required": [

@@ -24,10 +24,12 @@ import (
 // @description	Backend API sepcifications for prepper
 func newFiberServer(
 	lc fx.Lifecycle,
+
 	userHandler *handlers.UserHandler,
 	aiHandler *handlers.AIHandler,
 	pingHandler *handlers.PingHandler,
 	authMiddleware *handlers.AuthMiddleware,
+	applicationHandler *handlers.ApplicationHandler,
 
 	config config.EnvVars,
 ) {
@@ -69,8 +71,12 @@ func newFiberServer(
 	userGroup.Get("/healthcheck", authMiddleware.AuthenticateRoute, userHandler.HealthCheckUser)
 
 	applicationGroup := app.Group("/application")
-	applicationGroup.Get("/me", authMiddleware.AuthenticateRoute, userHandler.SignUpUser)
-	applicationGroup.Post("/create", authMiddleware.AuthenticateRoute, userHandler.SignUpUser)
+
+	// applicationGroup.Get("/me", authMiddleware.AuthenticateRoute, applicationHandler.ApplicationMe)
+	// applicationGroup.Post("/create", authMiddleware.AuthenticateRoute, applicationHandler.ApplicationCreate)
+
+	applicationGroup.Get("/me", authMiddleware.AuthenticateRoute, applicationHandler.ApplicationMe)
+	applicationGroup.Post("/create", authMiddleware.AuthenticateRoute, applicationHandler.ApplicationCreate)
 
 	AIGroup := app.Group("/ai")
 	AIGroup.Get("/getQuestions", aiHandler.GetQuestions)
@@ -103,6 +109,7 @@ func main() {
 			handlers.NewPingHandler,
 			handlers.NewAIHandler,
 			handlers.NewAuthMiddleware,
+			handlers.NewApplicationHandler,
 		),
 		fx.Invoke(newFiberServer),
 	).Run()

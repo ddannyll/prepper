@@ -1,4 +1,46 @@
 definitions:
+  ApplicationCreateBody:
+    properties:
+      description:
+        example: SafetyCulture is an Australian-based global technology company that
+          specialises in building inspection apps for the web and mobile devices.
+        type: string
+      icon:
+        description: icon link?
+        example: https://www.safetyculture.com/wp-content/uploads/2020/10/safetyculture-logo.svg
+        type: string
+      jobDescription:
+        example: Looking for an engineer to join our team.
+        type: string
+      name:
+        example: SafetyCulture
+        type: string
+    required:
+    - jobDescription
+    - name
+    type: object
+  ApplicationCreateResponse:
+    properties:
+      description:
+        example: SafetyCulture is an Australian-based global technology company that
+          specialises in building inspection apps for the web and mobile devices.
+        type: string
+      icon:
+        example: https://www.safetyculture.com/wp-content/uploads/2020/10/safetyculture-logo.svg
+        type: string
+      id:
+        example: "1337"
+        type: string
+      jobDescription:
+        example: Looking for an engineer to join our team.
+        type: string
+      name:
+        example: SafetyCulture
+        type: string
+    required:
+    - jobDescription
+    - name
+    type: object
   UserCredentials:
     properties:
       password:
@@ -48,6 +90,40 @@ paths:
       summary: Get some AI generated questions
       tags:
       - ai
+  /application/create:
+    post:
+      consumes:
+      - application/json
+      description: an application has some properties
+      parameters:
+      - description: Application
+        in: body
+        name: ApplicationCreateBody
+        required: true
+        schema:
+          $ref: '#/definitions/ApplicationCreateBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ApplicationCreateResponse'
+      summary: Create an application for the user
+      tags:
+      - application
+  /application/me:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Unauthorized
+      summary: Get user's applications
+      tags:
+      - application
   /ping:
     get:
       consumes:
@@ -94,7 +170,7 @@ paths:
             $ref: '#/definitions/UserSigninResponse'
         "401":
           description: Invalid Credentials
-      summary: Sign a user into dancord
+      summary: Sign a user
       tags:
       - user
   /user/signout:
