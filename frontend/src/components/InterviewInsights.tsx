@@ -69,9 +69,9 @@ export default function InterviewInsights({
   }
 
   return (
-    <div className="flex flex-col items-center justify-between p-8 h-full">
-      <div className="flex gap-8 w-full justify-center">
-        <div className="max-w-lg w-full p-6 shadow-md bg-white rounded-lg flex flex-col gap-3">
+    <div className="flex flex-col items-center overflow-hidden justify-between p-8 h-full">
+      <div className="flex gap-8 w-full overflow-hidden mb-4 justify-center">
+        <div className="max-w-lg w-full overflow-hidden p-6 shadow-md bg-white rounded-lg flex flex-col gap-3">
           <div className="flex gap-2 items-end">
             <QuestionNumber
               questionNum={questionIndex + 1}
@@ -88,7 +88,7 @@ export default function InterviewInsights({
             tags={question.tags}
             prompt={question.questionPrompt.split(" ")}
           />
-          <div className="mt-8 border-l border-indigo-500 px-4 py-1 shadow bg-gray-50 rounded">
+          <div className="mt-8 border-l overflow-y-scroll border-indigo-500 px-4 py-1 shadow bg-gray-50 rounded">
             <h2 className="text-lg font-bold text-gray-800">Your response</h2>
             <p className="text-gray-800">{answer}</p>
           </div>
