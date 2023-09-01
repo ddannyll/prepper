@@ -2,83 +2,108 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
-	"github.com/SafetyCulture/s12-apis-go/aigateway/v1"
+	"github.com/ddannyll/prepper/pkg/config"
+	"github.com/ddannyll/prepper/pkg/dbconnection"
+
+	_ "github.com/ddannyll/prepper/docs"
+	"github.com/ddannyll/prepper/pkg/handlers"
+	"github.com/ddannyll/prepper/pkg/storage"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/gofiber/swagger"
+
+	"go.uber.org/fx"
 )
 
-var identity string = "ai-gateway-examples"
-var namespace string = "actions"
+// @title			prepper API
+// @version		0.1
+// @description	Backend API sepcifications for prepper
+func newFiberServer(
+	lc fx.Lifecycle,
+	userHandler *handlers.UserHandler,
+	aiHandler *handlers.AIHandler,
+	pingHandler *handlers.PingHandler,
+	authMiddleware *handlers.AuthMiddleware,
+
+	config config.EnvVars,
+) {
+	app := fiber.New(fiber.Config{
+		ErrorHandler: func(ctx *fiber.Ctx, err error) error {
+			ctx.Set(fiber.HeaderContentType, fiber.MIMETextPlainCharsetUTF8)
+			// Overwrite the default error handler since we don't want to
+			// send potentially sensitive information in the event of
+			// unexpected errors
+
+			// If a handled error (one that is passed as *fiber.Error)
+			// we just send that back normally
+			var e *fiber.Error
+			if errors.As(err, &e) {
+				return ctx.Status(e.Code).SendString(e.Error())
+			}
+
+			// Otherwise send Internal Server Error
+			return ctx.Status(fiber.StatusInternalServerError).SendString("Internal Server Error")
+		},
+	})
+
+	// Middleware
+	app.Use(cors.New())
+	app.Use(logger.New())
+
+	// Docs
+	app.Get("/swagger/*", swagger.HandlerDefault)
+
+	// API Routes
+	app.Get("/ping", pingHandler.Ping)
+
+	// Group these together later...
+	userGroup := app.Group("/user")
+	userGroup.Post("/signup", userHandler.SignUpUser)
+	userGroup.Post("/signin", userHandler.SignInUser)
+	userGroup.Post("/signout", userHandler.SignOutUser)
+
+	userGroup.Get("/healthcheck", authMiddleware.AuthenticateRoute, userHandler.HealthCheckUser)
+
+	applicationGroup := app.Group("/application")
+	applicationGroup.Get("/me", authMiddleware.AuthenticateRoute, userHandler.SignUpUser)
+	applicationGroup.Post("/create", authMiddleware.AuthenticateRoute, userHandler.SignUpUser)
+
+	AIGroup := app.Group("/ai")
+	AIGroup.Get("/getQuestions", aiHandler.GetQuestions)
+	AIGroup.Post("/analyse", userHandler.SignUpUser)
+
+	// applicationGroup.Get("/myapplications", authMiddleware.AuthenticateRoute)
+
+	lc.Append(fx.Hook{
+		OnStart: func(ctx context.Context) error {
+			fmt.Printf("Starting Fiber - %s:%s\n", config.LISTEN_ON, config.PORT)
+			go app.Listen(fmt.Sprintf("%s:%s", config.LISTEN_ON, config.PORT))
+			return nil
+		},
+		OnStop: func(ctx context.Context) error {
+			return app.Shutdown()
+		},
+	})
+}
 
 func main() {
-	//Get an instance of an AIGateway client
-	aiClient := getClient()
+	fx.New(
+		fx.Provide(
+			config.LoadEnv,
 
-	// Get a Soter admin token
-	adminToken, err := getSoterAdminToken()
-	if err != nil {
-		panic(err)
-	}
-	// Put the token in an outgoing context
-	outCtx := getOutgoingContext(adminToken)
+			dbconnection.GetDBClient,
 
-	app := fiber.New()
+			storage.NewSessionStorage,
 
-	questions := generateQuestions(outCtx, aiClient)
-	app.Get("/questions", func(ctx *fiber.Ctx) error {
-		ctx.SendString(questions)
-		return nil
-	})
-
-	// analysis := analyseResponse(outCtx, aiClient)
-
-	app.Post("/analysis", func(ctx *fiber.Ctx) error {
-		r := &AnalysisRequest{}
-		err := ctx.BodyParser(r)
-		if err != nil {
-			fmt.Println(err)
-		}
-		response := analyseResponse(outCtx, aiClient, r)
-		ctx.SendString(response)
-		return nil
-	})
-
-	app.Listen(":8080")
-}
-
-type AnalysisRequest struct {
-	Question string
-	Answer   string
-}
-
-func generateQuestions(ctx context.Context, c aigateway.AIGatewayServiceClient) string {
-	req := &aigateway.CompleteTextRequest{
-		Prompt: "You are a senior hiring manager. Create a list of questions to ask when hiring for a junior software engineer. Return questions in a json array.",
-	}
-	resp, err := c.CompleteText(ctx, req)
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	return resp.Raw
-
-}
-
-func analyseResponse(ctx context.Context, c aigateway.AIGatewayServiceClient, r *AnalysisRequest) string {
-	question := r.Question
-	answer := r.Answer
-
-	// ["qwqewq", "hjgjhg"]
-
-	req := &aigateway.CompleteTextRequest{
-		Prompt: fmt.Sprintf("Evaluate the following answer '%v' in response to this question '%v'. Provide potential improvements for the answer.", answer, question),
-	}
-	resp, err := c.CompleteText(ctx, req)
-	if err != nil {
-		fmt.Println(err)
-	}
-	fmt.Println(resp.Raw)
-
-	return resp.Raw
+			handlers.NewUserHandler,
+			handlers.NewPingHandler,
+			handlers.NewAIHandler,
+			handlers.NewAuthMiddleware,
+		),
+		fx.Invoke(newFiberServer),
+	).Run()
 }

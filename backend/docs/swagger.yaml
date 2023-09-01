@@ -24,6 +24,30 @@ info:
   title: prepper API
   version: "0.1"
 paths:
+  /ai/analyse:
+    post:
+      consumes:
+      - application/json
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: OK
+      summary: analyse an answer to a question
+      tags:
+      - ai
+  /ai/getQuestions:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: OK
+      summary: Get some AI generated questions
+      tags:
+      - ai
   /ping:
     get:
       consumes:
