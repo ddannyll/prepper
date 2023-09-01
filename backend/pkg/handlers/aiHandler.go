@@ -18,14 +18,14 @@ func NewAIHandler() *AIHandler {
 
 // GetQuestions godoc
 //
-//	@Summary	Get some AI generated questions
+//	@Summary	Generate questions given a job position and type of questions wanted
 //	@Tags		ai
 //	@Accept		json
 //	@Produce	plain
 //	@Success	200
 //	@Router		/ai/getQuestions [get]
 func (p *AIHandler) GetQuestions(c *fiber.Ctx) error {
-
+	i := &SpecifiedQuestion{}
 	// TODO figure this out l8rrrr
 	client := aiGateway.GetAIClient()
 	adminToken, err := aiGateway.GetSoterAdminToken()
@@ -39,7 +39,7 @@ func (p *AIHandler) GetQuestions(c *fiber.Ctx) error {
 	}
 
 	outCtx := aiGateway.GetOutgoingContext(adminToken)
-	questions := generateQuestions(outCtx, client)
+	questions := generateQuestions(outCtx, client, i)
 
 	c.SendString(questions)
 	return nil
@@ -76,9 +76,11 @@ func (p *AIHandler) Analyse(c *fiber.Ctx) error {
 
 }
 
-func generateQuestions(ctx context.Context, c aigateway.AIGatewayServiceClient) string {
+func generateQuestions(ctx context.Context, c aigateway.AIGatewayServiceClient, i *SpecifiedQuestion) string {
+	questionType := i.QuestionType
+	position := i.JobPostion
 	req := &aigateway.CompleteTextRequest{
-		Prompt: "You are a senior hiring manager. Create a list of questions to ask when hiring for a junior software engineer. Return questions in a json array.",
+		Prompt: fmt.Sprintf("You are a senior hiring manager. Create a %v question for a %v role.", questionType, position),
 	}
 
 	resp, err := c.CompleteText(ctx, req)
@@ -86,18 +88,23 @@ func generateQuestions(ctx context.Context, c aigateway.AIGatewayServiceClient) 
 		fmt.Println(err)
 
 	}
-	return resp.Raw
+	fmt.Println(resp.Raw)
 
+	return resp.Raw
+}
+
+type SpecifiedQuestion struct {
+	JobPostion   string
+	QuestionType string
 }
 
 func analyseResponse(ctx context.Context, c aigateway.AIGatewayServiceClient, r *AnalysisRequest) string {
 	question := r.Question
 	answer := r.Answer
 
-	// ["qwqewq", "hjgjhg"]
-
 	req := &aigateway.CompleteTextRequest{
-		Prompt: fmt.Sprintf("Evaluate the following answer '%v' in response to this question '%v'. Provide potential improvements for the answer.", answer, question),
+		Prompt: fmt.Sprintf("Evaluate the following answer '%v' in response to this question '%v'. Provide two dot points, one for good feedback and one for potential improvements.", answer, question),
+		// ResponseExample: `{"good": [You answered the question.] "bad": [You should elaborate on your answer a bit more.]}`,
 	}
 	resp, err := c.CompleteText(ctx, req)
 	if err != nil {
@@ -105,6 +112,7 @@ func analyseResponse(ctx context.Context, c aigateway.AIGatewayServiceClient, r 
 	}
 	fmt.Println(resp.Raw)
 
+	resp.
 	return resp.Raw
 }
 
