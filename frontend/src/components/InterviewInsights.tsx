@@ -1,5 +1,6 @@
+import { v4 as uuid } from 'uuid';
 import { Question, questionAnswerPair } from "@/hooks/useQuestionPlayer";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { QuestionCardMainSection, QuestionNumber } from "./QuestionCard";
 import {
   IconAlertTriangle,
@@ -10,15 +11,33 @@ import {
   IconWand,
 } from "@tabler/icons-react";
 import IconButton from "./IconButton";
+import { MockInsightFetcher } from "@/service/insightFetcher";
+
+const insightFetcher = new MockInsightFetcher()
 
 interface InterviewInsightsProps {
   questionAnswerPairs: questionAnswerPair[] 
 }
+export interface Insight {
+  type: "good" | "bad"
+  insight: string
+}
 export default function InterviewInsights({
   questionAnswerPairs,
 }: InterviewInsightsProps) {
-  console.log(questionAnswerPairs)
   const [questionIndex, setQuestionIndex] = useState(0);
+  const [insights, setInsights] = useState<Insight[]>([])
+
+  useEffect(() => {
+    const getQAI = async () => {
+      const newInsights = await Promise.all(
+        questionAnswerPairs.map(qa => insightFetcher.getQAInsight(qa.question, qa.answer))
+      )
+      setInsights(newInsights)
+    }
+    getQAI()
+  }, [questionAnswerPairs])
+
   const question = useMemo(() => {
     if (!questionAnswerPairs || questionAnswerPairs.length == 0) {
       return null;
@@ -82,12 +101,11 @@ export default function InterviewInsights({
           </h1>
           <hr className="-mx-6 border-y-2 border-indigo-500" />
           <div className="grid grid-cols-2 gap-2">
-            <InsightComponent type="good">
-              Your name is Daniel Nguyen! Thats a cool name!
-            </InsightComponent>
-            <InsightComponent type="bad">
-              Your answer was too short!
-            </InsightComponent>
+            {insights.map(ins => 
+              <InsightComponent type={ins.type} key={uuid()}>
+                {ins.insight}
+              </InsightComponent>
+            )}
           </div>
         </div>
       </div>

@@ -11,11 +11,12 @@ const questionService = new MockQuestionFetcher();
 export default function Home() {
   const [keyboardOn, setKeyboardOn] = useState(false);
   const [questions, setQuestions] = useState<Question[]>([]);
-  const { finished, currQuestion, currQuestionNum, totalQuestionNum, questionAnswerPairs, advanceQuestion } =
+  const { finished, currQuestion, currQuestionNum, totalQuestionNum, questionAnswerPairs, advanceQuestion, submitAndAdvance } =
     useQuestionPlayer({ questions });
   const { read, currWordIndex } = useQuestionReader({
     question: currQuestion?.questionPrompt || "",
   });
+  const [keyboardVal, setKeyboardVal] = useState("")
 
   useEffect(() => {
     const getQuestions = async () => {
@@ -46,12 +47,17 @@ export default function Home() {
         <div className="flex flex-col items-center justify-end gap-8">
           <div className="max-w-lg w-full px-6 grow-0">
             <Keyboard
+              value={keyboardVal}
+              setValue={setKeyboardVal}
               className={!keyboardOn ? "opacity-0 transition" : "transition"}
             />
           </div>
           <AnswerControls
             onKeyboardClick={() => setKeyboardOn(!keyboardOn)}
-            onSubmitClick={advanceQuestion}
+            onSubmitClick={() => {
+              submitAndAdvance(keyboardVal)
+              setKeyboardVal("")
+            }}
             keyboardOn={keyboardOn}
           />
         </div>
