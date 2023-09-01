@@ -1,7 +1,7 @@
 import { Question } from "@/hooks/useQuestionPlayer";
 
 interface QuestionFetcher {
-  getQuestions: (interviewId: string) => Promise<Question>[]; // todo: replace this with neo's types
+  getQuestions: (interviewId: string) => Promise<Question[]>; // todo: replace this with neo's types
 }
 
 export class MockQuestionFetcher implements QuestionFetcher {

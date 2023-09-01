@@ -1,4 +1,5 @@
 import AnswerControls from "@/components/AnswerControls";
+import InterviewInsights from "@/components/InterviewInsights";
 import Keyboard from "@/components/Keyboard";
 import QuestionCard from "@/components/QuestionCard";
 import useQuestionPlayer, { Question } from "@/hooks/useQuestionPlayer";
@@ -10,7 +11,7 @@ const questionService = new MockQuestionFetcher();
 export default function Home() {
   const [keyboardOn, setKeyboardOn] = useState(false);
   const [questions, setQuestions] = useState<Question[]>([]);
-  const { currQuestion, currQuestionNum, totalQuestionNum, advanceQuestion } =
+  const { finished, currQuestion, currQuestionNum, totalQuestionNum, questionAnswerPairs, advanceQuestion } =
     useQuestionPlayer({ questions });
   const { read, currWordIndex } = useQuestionReader({
     question: currQuestion?.questionPrompt || "",
@@ -31,28 +32,35 @@ export default function Home() {
     return <div>loading</div>;
   }
 
-  return (
-    <div className="bg-gray-50 h-screen flex flex-col justify-between py-8">
-      <QuestionCard
-        className="mx-auto"
-        totalQuestionNum={totalQuestionNum}
-        prompt={currQuestion.questionPrompt.split(" ")}
-        promptReadIndex={currWordIndex}
-        tags={currQuestion.tags}
-        questionNum={currQuestionNum}
-      />
-      <div className="flex flex-col items-center justify-end gap-8">
-        <div className="max-w-lg w-full px-6 grow-0">
-          <Keyboard
-            className={!keyboardOn ? "opacity-0 transition" : "transition"}
+  if (!finished) {
+    return (
+      <div className="bg-gray-50 h-screen flex flex-col justify-between py-8">
+        <QuestionCard
+          className="mx-auto"
+          totalQuestionNum={totalQuestionNum}
+          prompt={currQuestion.questionPrompt.split(" ")}
+          promptReadIndex={currWordIndex}
+          tags={currQuestion.tags}
+          questionNum={currQuestionNum}
+        />
+        <div className="flex flex-col items-center justify-end gap-8">
+          <div className="max-w-lg w-full px-6 grow-0">
+            <Keyboard
+              className={!keyboardOn ? "opacity-0 transition" : "transition"}
+            />
+          </div>
+          <AnswerControls
+            onKeyboardClick={() => setKeyboardOn(!keyboardOn)}
+            onSubmitClick={advanceQuestion}
+            keyboardOn={keyboardOn}
           />
         </div>
-        <AnswerControls
-          onKeyboardClick={() => setKeyboardOn(!keyboardOn)}
-          onSubmitClick={advanceQuestion}
-          keyboardOn={keyboardOn}
-        />
       </div>
-    </div>
-  );
+    );
+  }
+
+  // INSIGHTS SECTION
+  return <div className="h-screen bg-gray-50">
+    <InterviewInsights questionAnswerPairs={questionAnswerPairs} />
+  </div>
 }
