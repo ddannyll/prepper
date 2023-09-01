@@ -9,6 +9,33 @@
  * ---------------------------------------------------------------
  */
 
+export interface ApplicationCreateBody {
+  /** @example "SafetyCulture is an Australian-based global technology company that specialises in building inspection apps for the web and mobile devices." */
+  description?: string;
+  /**
+   * icon link?
+   * @example "https://www.safetyculture.com/wp-content/uploads/2020/10/safetyculture-logo.svg"
+   */
+  icon?: string;
+  /** @example "Looking for an engineer to join our team." */
+  jobDescription: string;
+  /** @example "SafetyCulture" */
+  name: string;
+}
+
+export interface ApplicationCreateResponse {
+  /** @example "SafetyCulture is an Australian-based global technology company that specialises in building inspection apps for the web and mobile devices." */
+  description?: string;
+  /** @example "https://www.safetyculture.com/wp-content/uploads/2020/10/safetyculture-logo.svg" */
+  icon?: string;
+  /** @example "1337" */
+  id?: string;
+  /** @example "Looking for an engineer to join our team." */
+  jobDescription: string;
+  /** @example "SafetyCulture" */
+  name: string;
+}
+
 export interface UserCredentials {
   /**
    * @minLength 6
@@ -242,6 +269,73 @@ export class HttpClient<SecurityDataType = unknown> {
  * Backend API sepcifications for prepper
  */
 export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {
+  ai = {
+    /**
+     * No description
+     *
+     * @tags ai
+     * @name AnalyseCreate
+     * @summary analyse an answer to a question
+     * @request POST:/ai/analyse
+     */
+    analyseCreate: (params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/ai/analyse`,
+        method: "POST",
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags ai
+     * @name GetQuestionsList
+     * @summary Get some AI generated questions
+     * @request GET:/ai/getQuestions
+     */
+    getQuestionsList: (params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/ai/getQuestions`,
+        method: "GET",
+        type: ContentType.Json,
+        ...params,
+      }),
+  };
+  application = {
+    /**
+     * @description an application has some properties
+     *
+     * @tags application
+     * @name CreateCreate
+     * @summary Create an application for the user
+     * @request POST:/application/create
+     */
+    createCreate: (ApplicationCreateBody: ApplicationCreateBody, params: RequestParams = {}) =>
+      this.request<ApplicationCreateResponse, any>({
+        path: `/application/create`,
+        method: "POST",
+        body: ApplicationCreateBody,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags application
+     * @name GetApplication
+     * @summary Get user's applications
+     * @request GET:/application/me
+     */
+    getApplication: (params: RequestParams = {}) =>
+      this.request<void, void>({
+        path: `/application/me`,
+        method: "GET",
+        ...params,
+      }),
+  };
   ping = {
     /**
      * No description
@@ -280,7 +374,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      *
      * @tags user
      * @name SigninCreate
-     * @summary Sign a user into dancord
+     * @summary Sign a user
      * @request POST:/user/signin
      */
     signinCreate: (SignInBody: UserCredentials, params: RequestParams = {}) =>
