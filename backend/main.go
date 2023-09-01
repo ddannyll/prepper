@@ -74,7 +74,7 @@ func newFiberServer(
 
 	AIGroup := app.Group("/ai")
 	AIGroup.Get("/getQuestions", aiHandler.GetQuestions)
-	AIGroup.Post("/analyse", userHandler.SignUpUser)
+	AIGroup.Post("/analyse", aiHandler.Analyse)
 
 	// applicationGroup.Get("/myapplications", authMiddleware.AuthenticateRoute)
 
