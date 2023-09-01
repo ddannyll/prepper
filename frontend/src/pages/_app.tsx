@@ -1,8 +1,9 @@
 import { AppProps } from "next/app";
 import Head from "next/head";
 import "../styles/globals.css";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-// TODO: remove mantine replace with tailwind cause i CBF
+const queryClient = new QueryClient()
 export default function App(props: AppProps) {
   const { Component, pageProps } = props;
 
@@ -15,7 +16,9 @@ export default function App(props: AppProps) {
           content="minimum-scale=1, initial-scale=1, width=device-width"
         />
       </Head>
-      <Component {...pageProps} />
+      <QueryClientProvider client={queryClient}>
+        <Component {...pageProps} />
+      </QueryClientProvider>
     </>
   );
 }
