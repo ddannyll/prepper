@@ -1,5 +1,5 @@
 import { IconQuote } from "@tabler/icons-react";
-import Badge from "./Badge";
+import Badge from "./ui-kit/Badge";
 
 interface QuestionCardProps {
   questionNum: number;

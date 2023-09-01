@@ -3,7 +3,7 @@ import {
   IconKeyboard,
   IconMicrophone,
 } from "@tabler/icons-react";
-import IconButton from "./IconButton";
+import IconButton from "./ui-kit/IconButton";
 
 interface AnswerControlsProps {
   onSubmitClick?: () => void;

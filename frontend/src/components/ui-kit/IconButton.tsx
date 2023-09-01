@@ -4,6 +4,10 @@ interface IconButtonProps
   className?: string;
   active?: boolean;
 }
+
+/**
+ * Expects children to be a tabler icon (or any svg icon) 
+ */
 export default function IconButton({
   children,
   className,

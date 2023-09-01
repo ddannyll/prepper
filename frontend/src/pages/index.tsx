@@ -61,10 +61,6 @@ export default function Home() {
             keyboardOn={keyboardOn}
           />
         </div>
-        <button className="text-blue-400">
-          test
-          
-        </button>
       </div>
     );
   }

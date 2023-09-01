@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
-import Badge from '@/components/Badge';
+import Badge from '@/components/ui-kit/Badge';
 //👇 This default export determines where your story goes in the story list
 const meta: Meta = {
   component: Badge,
