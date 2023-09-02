@@ -7,8 +7,9 @@ import (
 )
 
 type EnvVars struct {
-	LISTEN_ON string
-	PORT      string
+	LISTEN_ON   string
+	PORT        string
+	GATEWAY_KEY string
 }
 
 func LoadEnv() EnvVars {
@@ -26,8 +27,8 @@ func LoadEnv() EnvVars {
 		port = "8080"
 	}
 	return EnvVars{
-
-		LISTEN_ON: listenOn,
-		PORT:      port,
+		LISTEN_ON:   listenOn,
+		PORT:        port,
+		GATEWAY_KEY: os.Getenv("OPENAI_API_KEY"),
 	}
 }

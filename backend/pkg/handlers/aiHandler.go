@@ -2,15 +2,19 @@ package handlers
 
 import (
 	"fmt"
-	"os"
 
+	"github.com/ddannyll/prepper/pkg/config"
 	"github.com/gofiber/fiber/v2"
 )
 
-type AIHandler struct{}
+type AIHandler struct {
+	// OpenAI gateway key
+	gateway_key string
+}
 
-func NewAIHandler() *AIHandler {
-	return &AIHandler{}
+func NewAIHandler(e config.EnvVars) *AIHandler {
+	newAiHandler := &AIHandler{gateway_key: e.GATEWAY_KEY}
+	return newAiHandler
 }
 
 // GetQuestions godoc
@@ -28,7 +32,7 @@ func (p *AIHandler) GetQuestions(c *fiber.Ctx) error {
 		fmt.Println(err)
 	}
 
-	openAIKey := os.Getenv("OPENAI_API_KEY")
+	openAIKey := p.gateway_key
 	newAI := NewAI(openAIKey)
 
 	questions, err := newAI.GetQuestion(c.Context(), i)
@@ -49,14 +53,13 @@ func (p *AIHandler) GetQuestions(c *fiber.Ctx) error {
 //	@Success	200
 //	@Router		/ai/analyse [post]
 func (p *AIHandler) Analyse(c *fiber.Ctx) error {
-	fmt.Println(fmt.Sprintf("hi"))
 	r := &AnalysisRequest{}
 	err := c.BodyParser(r)
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	openAIKey := os.Getenv("OPENAI_API_KEY")
+	openAIKey := p.gateway_key
 	newAI := NewAI(openAIKey)
 
 	response, err := newAI.AnalyseResponse(c.Context(), r)
