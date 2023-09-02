@@ -1,19 +1,20 @@
 package handlers
 
 import (
-	"context"
 	"fmt"
-	"log"
 
-	"github.com/SafetyCulture/s12-apis-go/aigateway/v1"
-	"github.com/ddannyll/prepper/pkg/aiGateway"
+	"github.com/ddannyll/prepper/pkg/config"
 	"github.com/gofiber/fiber/v2"
 )
 
-type AIHandler struct{}
+type AIHandler struct {
+	// OpenAI gateway key
+	gateway_key string
+}
 
-func NewAIHandler() *AIHandler {
-	return &AIHandler{}
+func NewAIHandler(e config.EnvVars) *AIHandler {
+	newAiHandler := &AIHandler{gateway_key: e.GATEWAY_KEY}
+	return newAiHandler
 }
 
 // GetQuestions godoc
@@ -26,20 +27,18 @@ func NewAIHandler() *AIHandler {
 //	@Router		/ai/getQuestions [get]
 func (p *AIHandler) GetQuestions(c *fiber.Ctx) error {
 	i := &SpecifiedQuestion{}
-	// TODO figure this out l8rrrr
-	client := aiGateway.GetAIClient()
-	adminToken, err := aiGateway.GetSoterAdminToken()
-
-	log.Println(adminToken)
-	log.Println(client)
-
+	err := c.BodyParser(i)
 	if err != nil {
-		log.Println(err)
-		return err
+		fmt.Println(err)
 	}
 
-	outCtx := aiGateway.GetOutgoingContext(adminToken)
-	questions := generateQuestions(outCtx, client, i)
+	openAIKey := p.gateway_key
+	newAI := NewAI(openAIKey)
+
+	questions, err := newAI.GetQuestion(c.Context(), i)
+	if err != nil {
+		fmt.Println(err)
+	}
 
 	c.SendString(questions)
 	return nil
@@ -55,46 +54,25 @@ func (p *AIHandler) GetQuestions(c *fiber.Ctx) error {
 //	@Router		/ai/analyse [post]
 func (p *AIHandler) Analyse(c *fiber.Ctx) error {
 	r := &AnalysisRequest{}
-	client := aiGateway.GetAIClient()
-
-	adminToken, err := aiGateway.GetSoterAdminToken()
-
-	if err != nil {
-
-		return err
-	}
-
-	outCtx := aiGateway.GetOutgoingContext(adminToken)
-	err = c.BodyParser(r)
+	err := c.BodyParser(r)
 	if err != nil {
 		fmt.Println(err)
 	}
-	response := analyseResponse(outCtx, client, r)
+
+	openAIKey := p.gateway_key
+	newAI := NewAI(openAIKey)
+
+	response, err := newAI.AnalyseResponse(c.Context(), r)
+	if err != nil {
+		fmt.Println(err)
+	}
+
 	c.SendString(response)
-
 	return nil
-
-}
-
-func generateQuestions(ctx context.Context, c aigateway.AIGatewayServiceClient, i *SpecifiedQuestion) string {
-	questionType := i.QuestionType
-	position := i.JobPostion
-	req := &aigateway.CompleteTextRequest{
-		Prompt: fmt.Sprintf("You are a senior hiring manager. Create a %v question for a %v role.", questionType, position),
-	}
-
-	resp, err := c.CompleteText(ctx, req)
-	if err != nil {
-		fmt.Println(err)
-
-	}
-	fmt.Println(resp.Raw)
-
-	return resp.Raw
 }
 
 type SpecifiedQuestion struct {
-	JobPostion   string
+	JobPosition  string
 	QuestionType string
 }
 
