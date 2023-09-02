@@ -7,6 +7,7 @@ import (
 
 	"github.com/ddannyll/prepper/pkg/config"
 	"github.com/ddannyll/prepper/pkg/dbconnection"
+	"github.com/ddannyll/prepper/pkg/service"
 
 	_ "github.com/ddannyll/prepper/docs"
 	"github.com/ddannyll/prepper/pkg/handlers"
@@ -110,6 +111,8 @@ func main() {
 			handlers.NewAIHandler,
 			handlers.NewAuthMiddleware,
 			handlers.NewApplicationHandler,
+
+			service.NewAI,
 		),
 		fx.Invoke(newFiberServer),
 	).Run()

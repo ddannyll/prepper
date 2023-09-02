@@ -10,10 +10,12 @@ import {
   IconWand,
 } from "@tabler/icons-react";
 import IconButton from './ui-kit/IconButton';
-import { MockInsightFetcher } from "@/service/insightFetcher";
+import { HTTPInsightFetcher, MockInsightFetcher } from "@/service/insightFetcher";
 import { QuestionAnswerPair } from '@/hooks/useQuestionPlayer';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
-const insightFetcher = new MockInsightFetcher()
+// const insightFetcher = new MockInsightFetcher()
+const insightFetcher = new HTTPInsightFetcher()
 
 interface InterviewInsightsProps {
   questionAnswerPairs: QuestionAnswerPair[] 
@@ -26,17 +28,22 @@ export default function InterviewInsights({
   questionAnswerPairs,
 }: InterviewInsightsProps) {
   const [questionIndex, setQuestionIndex] = useState(0);
-  const [insights, setInsights] = useState<Insight[]>([])
-
-  useEffect(() => {
-    const getQAI = async () => {
-      const newInsights = await Promise.all(
-        questionAnswerPairs.map(qa => insightFetcher.getQAInsight(qa.question.questionPrompt, qa.answer))
-      )
-      setInsights(newInsights)
-    }
-    getQAI()
-  }, [questionAnswerPairs])
+  const {isLoading: insightsLoading, data: insights} = useQuery(
+    {
+      queryKey: [
+        "insights",
+        questionAnswerPairs
+      ], 
+      queryFn: async ({queryKey}) => {
+        const qaPairs = queryKey[1] as QuestionAnswerPair[]
+        const insights = await Promise.all(
+          qaPairs.map(qa => insightFetcher.getQAInsight(qa.question.questionPrompt, qa.answer))
+        ) 
+        return insights
+      },
+      refetchOnWindowFocus: false
+    },
+  )
 
   const question = useMemo(() => {
     if (!questionAnswerPairs || questionAnswerPairs.length == 0) {
@@ -70,8 +77,8 @@ export default function InterviewInsights({
 
   return (
     <div className="flex flex-col items-center overflow-hidden justify-between p-8 h-full">
-      <div className="flex gap-8 w-full overflow-hidden mb-4 justify-center">
-        <div className="max-w-lg w-full overflow-hidden p-6 shadow-md bg-white rounded-lg flex flex-col gap-3">
+      <div className="flex gap-8 w-full pb-4 overflow-hidden justify-center">
+        <div className="max-w-lg w-ful h-full l overflow-hidden p-6 shadow-md bg-white rounded-lg flex flex-col gap-3">
           <div className="flex gap-2 items-end">
             <QuestionNumber
               questionNum={questionIndex + 1}
@@ -88,20 +95,20 @@ export default function InterviewInsights({
             tags={question.tags}
             prompt={question.questionPrompt.split(" ")}
           />
-          <div className="mt-8 border-l overflow-y-scroll border-indigo-500 px-4 py-1 shadow bg-gray-50 rounded">
+          <div className="mt-8 border-l overflow-y-auto border-indigo-500 px-4 py-1 shadow bg-gray-50 rounded">
             <h2 className="text-lg font-bold text-gray-800">Your response</h2>
             <p className="text-gray-800">{answer}</p>
           </div>
         </div>
 
-        <div className="flex flex-col items-stretch gap-4 grow shadow-md rounded-lg bg-white p-6 w-full max-w-lg">
+        <div className="flex flex-col items-stretch gap-4 overflow-hidden grow shadow-md rounded-lg bg-white p-6 w-full max-w-lg">
           <h1 className="flex gap-2 text-3xl font-bold">
             Insights
             <IconWand className="h-9 w-9" />
           </h1>
           <hr className="-mx-6 border-y-2 border-indigo-500" />
-          <div className="grid grid-cols-2 gap-2">
-            {insights.map(ins => 
+          <div className="grid grid-cols-1 gap-2">
+            {!insightsLoading && insights && insights[questionIndex].map(ins => 
               <InsightComponent type={ins.type} key={uuid()}>
                 {ins.insight}
               </InsightComponent>
@@ -141,7 +148,7 @@ function InsightComponent({ type, children }: InsightComponentProps) {
   return (
     <div className="flex rounded-md overflow-hidden items-start shadow">
       <div className={`shrink-0 p-2 w-fit h-full ${bgClasses}`}>{icon}</div>
-      <div className="p-2 text-gray-800 bg-gray-50">{children}</div>
+      <div className="p-2 text-gray-800 bg-gray-50 h-full">{children}</div>
     </div>
   );
 }

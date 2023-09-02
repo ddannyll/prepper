@@ -1,7 +1,8 @@
 import { Insight } from "@/components/InterviewInsights";
+import { backendAPI } from "./API";
 
 interface InsightFetcher {
-  getQAInsight: (question: string, answer: string) => Promise<Insight>
+  getQAInsight: (question: string, answer: string) => Promise<Insight[]>
 }
 
 export class MockInsightFetcher implements InsightFetcher {
@@ -12,8 +13,17 @@ export class MockInsightFetcher implements InsightFetcher {
       insight: "dummy insight"
     }
     console.log("mock fetching insight", question, answer)
-    return insight
+    return [insight]
   }
 }
 
 
+export class HTTPInsightFetcher implements InsightFetcher {
+  async getQAInsight(question:string, answer: string) {
+    const resp = await backendAPI.ai.analyseCreate({question, answer}) 
+    const formatted: Insight[] = []
+    resp.data?.good?.forEach(goodInsight => formatted.push({type:"good", insight: goodInsight}))
+    resp.data?.bad?.forEach(badInsight => formatted.push({type:"bad", insight: badInsight}))
+    return formatted
+  }
+}

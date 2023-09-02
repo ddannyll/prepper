@@ -51,6 +51,16 @@ export interface UserSigninResponse {
   id?: string;
 }
 
+export interface HandlersAnalysisRequest {
+  answer?: string;
+  question?: string;
+}
+
+export interface ServiceAnalysis {
+  bad?: string[];
+  good?: string[];
+}
+
 export type QueryParamsType = Record<string | number, any>;
 export type ResponseFormat = keyof Omit<Body, "body" | "bodyUsed">;
 
@@ -278,27 +288,13 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @summary analyse an answer to a question
      * @request POST:/ai/analyse
      */
-    analyseCreate: (params: RequestParams = {}) =>
-      this.request<void, any>({
+    analyseCreate: (QAPair: HandlersAnalysisRequest, params: RequestParams = {}) =>
+      this.request<ServiceAnalysis, any>({
         path: `/ai/analyse`,
         method: "POST",
+        body: QAPair,
         type: ContentType.Json,
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags ai
-     * @name GetQuestionsList
-     * @summary Get some AI generated questions
-     * @request GET:/ai/getQuestions
-     */
-    getQuestionsList: (params: RequestParams = {}) =>
-      this.request<void, any>({
-        path: `/ai/getQuestions`,
-        method: "GET",
-        type: ContentType.Json,
+        format: "json",
         ...params,
       }),
   };

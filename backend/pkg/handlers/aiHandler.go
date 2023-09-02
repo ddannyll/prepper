@@ -3,18 +3,19 @@ package handlers
 import (
 	"fmt"
 
-	"github.com/ddannyll/prepper/pkg/config"
 	"github.com/ddannyll/prepper/pkg/service"
 	"github.com/gofiber/fiber/v2"
 )
 
 type AIHandler struct {
 	// OpenAI gateway key
-	gateway_key string
+	aiService *service.AI
 }
 
-func NewAIHandler(e config.EnvVars) *AIHandler {
-	newAiHandler := &AIHandler{gateway_key: e.GATEWAY_KEY}
+func NewAIHandler(aiService *service.AI) *AIHandler {
+	newAiHandler := &AIHandler{
+		aiService: aiService,
+	}
 	return newAiHandler
 }
 
@@ -37,10 +38,7 @@ func (p *AIHandler) GetQuestions(c *fiber.Ctx) error {
 		fmt.Println(err)
 	}
 
-	openAIKey := p.gateway_key
-	newAI := service.NewAI(openAIKey)
-
-	questions, err := newAI.GetQuestion(c.Context(), &service.SpecificQuestion{
+	questions, err := p.aiService.GetQuestion(c.Context(), &service.SpecificQuestion{
 		QuestionType: i.QuestionType,
 		JobPosition: i.JobPosition,
 	})
@@ -68,10 +66,7 @@ func (p *AIHandler) Analyse(c *fiber.Ctx) error {
 		fmt.Println(err)
 	}
 
-	openAIKey := p.gateway_key
-	newAI := service.NewAI(openAIKey)
-
-	response, err := newAI.AnalyseResponse(c.Context(), &service.QuestionAnswerPair{
+	response, err := p.aiService.AnalyseResponse(c.Context(), &service.QuestionAnswerPair{
 		Question: r.Question,
 		Answer: r.Answer,
 	})

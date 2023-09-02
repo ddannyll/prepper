@@ -4,7 +4,9 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strings"
 
+	"github.com/ddannyll/prepper/pkg/config"
 	"github.com/sashabaranov/go-openai"
 )
 
@@ -12,8 +14,8 @@ type AI struct {
 	Key string
 }
 
-func NewAI(openAIKey string) *AI {
-	newAI := &AI{Key: openAIKey}
+func NewAI(env config.EnvVars) *AI {
+	newAI := &AI{Key: env.GATEWAY_KEY}
 	return newAI
 }
 
@@ -52,11 +54,19 @@ type Analysis struct {
 func (o *AI) AnalyseResponse(ctx context.Context, r *QuestionAnswerPair) (Analysis, error) {
 	question := r.Question
 	answer := r.Answer
+	
+	noWhiteSpace := strings.ReplaceAll(answer, " ", "")
+	if len(noWhiteSpace) == 0 {
+		return Analysis{
+			Bad: []string{"No response was given"},
+			Good: []string{},
+		}, nil
+	}
 
 	completionRequest := openai.CompletionRequest{
 		Model:       openai.GPT3TextDavinci003,
 		MaxTokens:   2000,
-		Prompt:      fmt.Sprintf("Evaluate the following answer '%v' in response to this question '%v'. Provide multiple dot points for good feedback and multiple dot points for potential improvements. Return the evaluation in JSON format { \"good\": [], \"bad\": [] }.", answer, question),
+		Prompt:      fmt.Sprintf("You are a recruiter at a company reviewing an applications response to interview questions. Evaluate the following answer '%v' in response to this question '%v'. Provide multiple dot points for good feedback and multiple dot points for potential improvements, Return the evaluation in JSON format { \"good\": [], \"bad\": [] }.", answer, question),
 		Temperature: 0,
 	}
 
@@ -67,6 +77,7 @@ func (o *AI) AnalyseResponse(ctx context.Context, r *QuestionAnswerPair) (Analys
 	if err != nil {
 		return analysis, err
 	}
+
 	json.Unmarshal([]byte(resp.Choices[0].Text), &analysis)
 
 	return analysis, nil
