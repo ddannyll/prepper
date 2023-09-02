@@ -75,6 +75,24 @@ type SpecifiedQuestion struct {
 	JobPosition  string
 	QuestionType string
 }
+
+func analyseResponse(ctx context.Context, c aigateway.AIGatewayServiceClient, r *AnalysisRequest) string {
+	question := r.Question
+	answer := r.Answer
+
+	req := &aigateway.CompleteTextRequest{
+		Prompt: fmt.Sprintf("Evaluate the following answer '%v' in response to this question '%v'. Provide two dot points, one for good feedback and one for potential improvements.", answer, question),
+		// ResponseExample: `{"good": [You answered the question.] "bad": [You should elaborate on your answer a bit more.]}`,
+	}
+	resp, err := c.CompleteText(ctx, req)
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(resp.Raw)
+
+	return resp.Raw
+}
+
 type AnalysisRequest struct {
 	Question string
 	Answer   string
