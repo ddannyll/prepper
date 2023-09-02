@@ -21,6 +21,9 @@ export class MockInsightFetcher implements InsightFetcher {
 export class HTTPInsightFetcher implements InsightFetcher {
   async getQAInsight(question:string, answer: string) {
     const resp = await backendAPI.ai.analyseCreate({question, answer}) 
+    if (!resp.ok) {
+      throw new Error("failed to fetch")
+    }
     const formatted: Insight[] = []
     resp.data?.good?.forEach(goodInsight => formatted.push({type:"good", insight: goodInsight}))
     resp.data?.bad?.forEach(badInsight => formatted.push({type:"bad", insight: badInsight}))

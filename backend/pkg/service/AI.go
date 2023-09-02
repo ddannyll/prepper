@@ -62,6 +62,13 @@ func (o *AI) AnalyseResponse(ctx context.Context, r *QuestionAnswerPair) (Analys
 			Good: []string{},
 		}, nil
 	}
+	words := strings.Split(answer, "")
+	if len(words) < 25 {
+		return Analysis{
+			Bad: []string{"Response too short to be processed by AI"},
+			Good: []string{},
+		}, nil
+	}
 
 	completionRequest := openai.CompletionRequest{
 		Model:       openai.GPT3TextDavinci003,

@@ -72,6 +72,7 @@ func (p *AIHandler) Analyse(c *fiber.Ctx) error {
 	})
 	if err != nil {
 		fmt.Println(err)
+		return fiber.NewError(fiber.StatusInternalServerError, "failed to process AI requst")
 	}
 	
 	return c.JSON(response)	

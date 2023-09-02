@@ -13,6 +13,7 @@ import IconButton from './ui-kit/IconButton';
 import { HTTPInsightFetcher, MockInsightFetcher } from "@/service/insightFetcher";
 import { QuestionAnswerPair } from '@/hooks/useQuestionPlayer';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { Skeleton } from './ui/skeleton';
 
 // const insightFetcher = new MockInsightFetcher()
 const insightFetcher = new HTTPInsightFetcher()
@@ -28,7 +29,7 @@ export default function InterviewInsights({
   questionAnswerPairs,
 }: InterviewInsightsProps) {
   const [questionIndex, setQuestionIndex] = useState(0);
-  const {isLoading: insightsLoading, data: insights} = useQuery(
+  const {isLoading: insightsLoading, data: insights, isError} = useQuery(
     {
       queryKey: [
         "insights",
@@ -78,17 +79,12 @@ export default function InterviewInsights({
   return (
     <div className="flex flex-col items-center overflow-hidden justify-between p-8 h-full">
       <div className="flex gap-8 w-full pb-4 overflow-hidden justify-center">
-        <div className="max-w-lg w-ful h-full l overflow-hidden p-6 shadow-md bg-white rounded-lg flex flex-col gap-3">
+        <div className="max-w-lg w-ful h-full grow overflow-hidden p-6 shadow-md bg-white rounded-lg flex flex-col gap-3">
           <div className="flex gap-2 items-end">
             <QuestionNumber
               questionNum={questionIndex + 1}
               totalQuestionNum={questionAnswerPairs.length}
             />
-            {
-              // <p className="flex gap-2 text-indigo-500 italic">
-              // Insights
-              // </p>
-            }
           </div>
           <hr className="-mx-6 border-y-2 border-indigo-500" />
           <QuestionCardMainSection
@@ -101,18 +97,27 @@ export default function InterviewInsights({
           </div>
         </div>
 
-        <div className="flex flex-col items-stretch gap-4 overflow-hidden grow shadow-md rounded-lg bg-white p-6 w-full max-w-lg">
+        <div className="flex flex-col grow items-stretch gap-4 overflow-hidden h-fit shadow-md rounded-lg bg-white p-6 w-full max-w-lg">
           <h1 className="flex gap-2 text-3xl font-bold">
             Insights
             <IconWand className="h-9 w-9" />
           </h1>
           <hr className="-mx-6 border-y-2 border-indigo-500" />
           <div className="grid grid-cols-1 gap-2">
+            {
+              insightsLoading && <div className='grid grid-cols-[40px_1fr] gap-2'>
+                <Skeleton className="w-full aspect-square bg-gray-200"/>
+                <Skeleton className="h-20 bg-gray-200"/>
+                <Skeleton className="w-full aspect-square bg-gray-200"/>
+                <Skeleton className="h-full bg-gray-200"/>
+              </div>
+            }
             {!insightsLoading && insights && insights[questionIndex].map(ins => 
               <InsightComponent type={ins.type} key={uuid()}>
                 {ins.insight}
               </InsightComponent>
             )}
+            {isError && <div>error</div>}
           </div>
         </div>
       </div>
@@ -146,9 +151,9 @@ function InsightComponent({ type, children }: InsightComponentProps) {
       <IconAlertTriangle className={`text-red-900 ${iconClasses}`} />
     );
   return (
-    <div className="flex rounded-md overflow-hidden items-start shadow">
+    <div className="flex rounded-md w-full overflow-hidden items-start shadow">
       <div className={`shrink-0 p-2 w-fit h-full ${bgClasses}`}>{icon}</div>
-      <div className="p-2 text-gray-800 bg-gray-50 h-full">{children}</div>
+      <div className="p-2 text-gray-800 bg-gray-50 h-full w-full">{children}</div>
     </div>
   );
 }
