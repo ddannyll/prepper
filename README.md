@@ -37,3 +37,4 @@ http://localhost:8080/swagger/index.html
 To speed up the workflow, we will create the API to use using the swagger json files.
 
 ```npx swagger-typescript-api -p ../backend/docs/swagger.json  -o ./src/service/swagger```
+(run in ./frontend)
