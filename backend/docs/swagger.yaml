@@ -60,6 +60,24 @@ definitions:
         example: "1337"
         type: string
     type: object
+  handlers.AnalysisRequest:
+    properties:
+      answer:
+        type: string
+      question:
+        type: string
+    type: object
+  service.Analysis:
+    properties:
+      bad:
+        items:
+          type: string
+        type: array
+      good:
+        items:
+          type: string
+        type: array
+    type: object
 info:
   contact: {}
   description: Backend API sepcifications for prepper
@@ -70,24 +88,21 @@ paths:
     post:
       consumes:
       - application/json
+      parameters:
+      - description: Question and Answer to be analysed by AI
+        in: body
+        name: QAPair
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.AnalysisRequest'
       produces:
-      - text/plain
-      responses:
-        "200":
-          description: OK
-      summary: analyse an answer to a question
-      tags:
-      - ai
-  /ai/getQuestions:
-    get:
-      consumes:
       - application/json
-      produces:
-      - text/plain
       responses:
         "200":
           description: OK
-      summary: Get some AI generated questions
+          schema:
+            $ref: '#/definitions/service.Analysis'
+      summary: analyse an answer to a question
       tags:
       - ai
   /application/create:

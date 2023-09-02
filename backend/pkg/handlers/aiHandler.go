@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/ddannyll/prepper/pkg/config"
+	"github.com/ddannyll/prepper/pkg/service"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -25,6 +26,10 @@ func NewAIHandler(e config.EnvVars) *AIHandler {
 //	@Produce	plain
 //	@Success	200
 //	@Router		/ai/getQuestions [get]
+type SpecifiedQuestion struct {
+	JobPosition  string `json:"jobPosition"`
+	QuestionType string `json:"questionType"`
+}
 func (p *AIHandler) GetQuestions(c *fiber.Ctx) error {
 	i := &SpecifiedQuestion{}
 	err := c.BodyParser(i)
@@ -33,9 +38,12 @@ func (p *AIHandler) GetQuestions(c *fiber.Ctx) error {
 	}
 
 	openAIKey := p.gateway_key
-	newAI := NewAI(openAIKey)
+	newAI := service.NewAI(openAIKey)
 
-	questions, err := newAI.GetQuestion(c.Context(), i)
+	questions, err := newAI.GetQuestion(c.Context(), &service.SpecificQuestion{
+		QuestionType: i.QuestionType,
+		JobPosition: i.JobPosition,
+	})
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -49,8 +57,9 @@ func (p *AIHandler) GetQuestions(c *fiber.Ctx) error {
 //	@Summary	analyse an answer to a question
 //	@Tags		ai
 //	@Accept		json
-//	@Produce	plain
-//	@Success	200
+//  @Param    QAPair body AnalysisRequest true "Question and Answer to be analysed by AI"
+//	@Produce	json
+//	@Success	200 {object} service.Analysis
 //	@Router		/ai/analyse [post]
 func (p *AIHandler) Analyse(c *fiber.Ctx) error {
 	r := &AnalysisRequest{}
@@ -60,40 +69,37 @@ func (p *AIHandler) Analyse(c *fiber.Ctx) error {
 	}
 
 	openAIKey := p.gateway_key
-	newAI := NewAI(openAIKey)
+	newAI := service.NewAI(openAIKey)
 
-	response, err := newAI.AnalyseResponse(c.Context(), r)
+	response, err := newAI.AnalyseResponse(c.Context(), &service.QuestionAnswerPair{
+		Question: r.Question,
+		Answer: r.Answer,
+	})
 	if err != nil {
 		fmt.Println(err)
 	}
-
-	c.SendString(response)
-	return nil
+	
+	return c.JSON(response)	
 }
-
-type SpecifiedQuestion struct {
-	JobPosition  string
-	QuestionType string
-}
-
-func analyseResponse(ctx context.Context, c aigateway.AIGatewayServiceClient, r *AnalysisRequest) string {
-	question := r.Question
-	answer := r.Answer
-
-	req := &aigateway.CompleteTextRequest{
-		Prompt: fmt.Sprintf("Evaluate the following answer '%v' in response to this question '%v'. Provide two dot points, one for good feedback and one for potential improvements.", answer, question),
-		// ResponseExample: `{"good": [You answered the question.] "bad": [You should elaborate on your answer a bit more.]}`,
-	}
-	resp, err := c.CompleteText(ctx, req)
-	if err != nil {
-		fmt.Println(err)
-	}
-	fmt.Println(resp.Raw)
-
-	return resp.Raw
-}
-
 type AnalysisRequest struct {
-	Question string
-	Answer   string
+	Question string `json:"question"`
+	Answer   string `json:"answer"`
 }
+
+// Question from daniel: is this deprecated? 
+// func analyseResponse(ctx context.Context, c aigateway.AIGatewayServiceClient, r *AnalysisRequest) string {
+// 	question := r.Question
+// 	answer := r.Answer
+//
+// 	req := &aigateway.CompleteTextRequest{
+// 		Prompt: fmt.Sprintf("Evaluate the following answer '%v' in response to this question '%v'. Provide two dot points, one for good feedback and one for potential improvements.", answer, question),
+// 		// ResponseExample: `{"good": [You answered the question.] "bad": [You should elaborate on your answer a bit more.]}`,
+// 	}
+// 	resp, err := c.CompleteText(ctx, req)
+// 	if err != nil {
+// 		fmt.Println(err)
+// 	}
+// 	fmt.Println(resp.Raw)
+//
+// 	return resp.Raw
+// }
