@@ -5,7 +5,7 @@ interface IconButtonProps
   variant?: "primary" | "secondary" | "tertiary" | "danger"
   size?: "sm" | "md" | "lg"
 }
-export default function Button({children, size="md", className, variant="primary"}: IconButtonProps) {
+export default function Button({children, size="md", className, variant="primary", ...props}: IconButtonProps) {
   const buttonClasses = "rounded-md transition"
   const sizeClasses =  {
     sm: "px-3 py-1 text-sm",
@@ -18,7 +18,7 @@ export default function Button({children, size="md", className, variant="primary
     tertiary: "text-blue-600 hover:bg-blue-100",
     danger: "bg-red-500 text-red-50 hover:bg-red-400",
   }
-  return <button className={`${buttonClasses} ${sizeClasses[size]} ${variantClasses[variant]} ${className}`}>
+  return <button className={`${buttonClasses} ${sizeClasses[size]} ${variantClasses[variant]} ${className}`} {...props}>
     {children}
   </button>
 }
