@@ -1,5 +1,4 @@
 import { v4 as uuid } from 'uuid';
-import { Question, questionAnswerPair } from "@/hooks/useQuestionPlayer";
 import { useEffect, useMemo, useState } from "react";
 import { QuestionCardMainSection, QuestionNumber } from "./QuestionCard";
 import {
@@ -10,13 +9,14 @@ import {
   IconThumbUp,
   IconWand,
 } from "@tabler/icons-react";
-import IconButton from "./IconButton";
+import IconButton from './ui-kit/IconButton';
 import { MockInsightFetcher } from "@/service/insightFetcher";
+import { QuestionAnswerPair } from '@/hooks/useQuestionPlayer';
 
 const insightFetcher = new MockInsightFetcher()
 
 interface InterviewInsightsProps {
-  questionAnswerPairs: questionAnswerPair[] 
+  questionAnswerPairs: QuestionAnswerPair[] 
 }
 export interface Insight {
   type: "good" | "bad"
@@ -31,7 +31,7 @@ export default function InterviewInsights({
   useEffect(() => {
     const getQAI = async () => {
       const newInsights = await Promise.all(
-        questionAnswerPairs.map(qa => insightFetcher.getQAInsight(qa.question, qa.answer))
+        questionAnswerPairs.map(qa => insightFetcher.getQAInsight(qa.question.questionPrompt, qa.answer))
       )
       setInsights(newInsights)
     }
