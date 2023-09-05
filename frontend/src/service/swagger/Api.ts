@@ -47,6 +47,7 @@ export interface UserCredentials {
 }
 
 export interface UserSigninResponse {
+  access_token?: string;
   /** @example "1337" */
   id?: string;
 }
@@ -59,6 +60,10 @@ export interface HandlersAnalysisRequest {
 export interface ServiceAnalysis {
   bad?: string[];
   good?: string[];
+}
+
+export interface ServiceVoice2TextResponse {
+  text?: string;
 }
 
 export type QueryParamsType = Record<string | number, any>;
@@ -297,6 +302,22 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         format: "json",
         ...params,
       }),
+
+    /**
+     * @description The API endpoint expects an audio file in audio/webm format to be provided in the request body as a blob.
+     *
+     * @tags ai
+     * @name Voice2TextCreate
+     * @summary convert voice to text
+     * @request POST:/ai/voice2text
+     */
+    voice2TextCreate: (params: RequestParams = {}) =>
+      this.request<ServiceVoice2TextResponse, any>({
+        path: `/ai/voice2text`,
+        method: "POST",
+        format: "json",
+        ...params,
+      }),
   };
   application = {
     /**
@@ -340,11 +361,13 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @name PingList
      * @summary Ping the server
      * @request GET:/ping
+     * @secure
      */
     pingList: (params: RequestParams = {}) =>
       this.request<string, any>({
         path: `/ping`,
         method: "GET",
+        secure: true,
         type: ContentType.Json,
         ...params,
       }),

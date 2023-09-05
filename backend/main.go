@@ -23,6 +23,11 @@ import (
 // @title			prepper API
 // @version		0.1
 // @description	Backend API sepcifications for prepper
+// @Security ApiKeyAuth
+// @SecurityDefinitions.apikey ApiKeyAuth
+// @in header
+// @name Authorization
+
 func newFiberServer(
 	lc fx.Lifecycle,
 
@@ -61,7 +66,7 @@ func newFiberServer(
 	app.Get("/swagger/*", swagger.HandlerDefault)
 
 	// API Routes
-	app.Get("/ping", pingHandler.Ping)
+	app.Get("/ping", authMiddleware.AuthenticateRoute, pingHandler.Ping)
 
 	// Group these together later...
 	userGroup := app.Group("/user")
@@ -82,6 +87,7 @@ func newFiberServer(
 	AIGroup := app.Group("/ai")
 	AIGroup.Get("/getQuestions", aiHandler.GetQuestions)
 	AIGroup.Post("/analyse", aiHandler.Analyse)
+	AIGroup.Post("/voice2text", aiHandler.Voice2Text)
 
 	// applicationGroup.Get("/myapplications", authMiddleware.AuthenticateRoute)
 
