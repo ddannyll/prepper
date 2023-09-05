@@ -1,11 +1,13 @@
 import AnswerControls from "@/components/AnswerControls";
+import AudioRecorder from "@/components/AudioControl";
 import InterviewInsights from "@/components/InterviewInsights";
 import Keyboard from "@/components/Keyboard";
 import QuestionCard from "@/components/QuestionCard";
 import useQuestionPlayer, { Question } from "@/hooks/useQuestionPlayer";
 import { useQuestionReader } from "@/hooks/useQuestionReader";
+import { BASE_URL, backendAPI } from "@/service/API";
 import { MockQuestionFetcher } from "@/service/questionFetcher";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const questionService = new MockQuestionFetcher();
 export default function Home() {
@@ -17,6 +19,7 @@ export default function Home() {
     question: currQuestion?.questionPrompt || "",
   });
   const [keyboardVal, setKeyboardVal] = useState("")
+  const [micOn, setMicOn] = useState(false);
 
   useEffect(() => {
     const getQuestions = async () => {
@@ -51,8 +54,13 @@ export default function Home() {
               setValue={setKeyboardVal}
               className={!keyboardOn ? "opacity-0 transition" : "transition"}
             />
+            {micOn && <AudioRecorder />}
           </div>
           <AnswerControls
+            onMicClick={() => {
+              setMicOn(!micOn);
+              // record and store audio
+            }}
             onKeyboardClick={() => setKeyboardOn(!keyboardOn)}
             onSubmitClick={() => {
               submitAndAdvance(keyboardVal)

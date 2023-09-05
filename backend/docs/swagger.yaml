@@ -78,6 +78,11 @@ definitions:
           type: string
         type: array
     type: object
+  service.Voice2TextResponse:
+    properties:
+      text:
+        type: string
+    type: object
 info:
   contact: {}
   description: Backend API sepcifications for prepper
@@ -103,6 +108,22 @@ paths:
           schema:
             $ref: '#/definitions/service.Analysis'
       summary: analyse an answer to a question
+      tags:
+      - ai
+  /ai/voice2text:
+    post:
+      consumes:
+      - application/octet-stream
+      description: The API endpoint expects an audio file in audio/webm format to
+        be provided in the request body as a blob.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/service.Voice2TextResponse'
+      summary: convert voice to text
       tags:
       - ai
   /application/create:

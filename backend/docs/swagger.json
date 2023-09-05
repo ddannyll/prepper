@@ -40,6 +40,29 @@
                 }
             }
         },
+        "/ai/voice2text": {
+            "post": {
+                "description": "The API endpoint expects an audio file in audio/webm format to be provided in the request body as a blob.",
+                "consumes": [
+                    "application/octet-stream"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ai"
+                ],
+                "summary": "convert voice to text",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/service.Voice2TextResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/application/create": {
             "post": {
                 "description": "an application has some properties",
@@ -329,6 +352,14 @@
                     "items": {
                         "type": "string"
                     }
+                }
+            }
+        },
+        "service.Voice2TextResponse": {
+            "type": "object",
+            "properties": {
+                "text": {
+                    "type": "string"
                 }
             }
         }

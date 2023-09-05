@@ -61,6 +61,10 @@ export interface ServiceAnalysis {
   good?: string[];
 }
 
+export interface ServiceVoice2TextResponse {
+  text?: string;
+}
+
 export type QueryParamsType = Record<string | number, any>;
 export type ResponseFormat = keyof Omit<Body, "body" | "bodyUsed">;
 
@@ -294,6 +298,22 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         method: "POST",
         body: QAPair,
         type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description The API endpoint expects an audio file in audio/webm format to be provided in the request body as a blob.
+     *
+     * @tags ai
+     * @name Voice2TextCreate
+     * @summary convert voice to text
+     * @request POST:/ai/voice2text
+     */
+    voice2TextCreate: (params: RequestParams = {}) =>
+      this.request<ServiceVoice2TextResponse, any>({
+        path: `/ai/voice2text`,
+        method: "POST",
         format: "json",
         ...params,
       }),

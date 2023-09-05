@@ -15,15 +15,20 @@ type AI struct {
 }
 
 func NewAI(env config.EnvVars) *AI {
+
+	fmt.Println("Key: ", env.GATEWAY_KEY)
+
 	newAI := &AI{Key: env.GATEWAY_KEY}
 	return newAI
 }
 
 type SpecificQuestion struct {
-	JobPosition string
+	JobPosition  string
 	QuestionType string
 }
+
 func (o *AI) GetQuestion(ctx context.Context, i *SpecificQuestion) (string, error) {
+
 	position := i.JobPosition
 	questionType := i.QuestionType
 
@@ -35,6 +40,7 @@ func (o *AI) GetQuestion(ctx context.Context, i *SpecificQuestion) (string, erro
 	}
 
 	c := openai.NewClient(o.Key)
+
 	resp, err := c.CreateCompletion(ctx, completionRequest)
 	if err != nil {
 		return "", err
@@ -45,27 +51,32 @@ func (o *AI) GetQuestion(ctx context.Context, i *SpecificQuestion) (string, erro
 
 type QuestionAnswerPair struct {
 	Question string
-	Answer string
+	Answer   string
 }
 type Analysis struct {
 	Good []string `json:"good"`
-	Bad []string `json:"bad"`
+	Bad  []string `json:"bad"`
 }
+
+type Voice2TextResponse struct {
+	Text string `json:"text"`
+}
+
 func (o *AI) AnalyseResponse(ctx context.Context, r *QuestionAnswerPair) (Analysis, error) {
 	question := r.Question
 	answer := r.Answer
-	
+
 	noWhiteSpace := strings.ReplaceAll(answer, " ", "")
 	if len(noWhiteSpace) == 0 {
 		return Analysis{
-			Bad: []string{"No response was given"},
+			Bad:  []string{"No response was given"},
 			Good: []string{},
 		}, nil
 	}
 	words := strings.Split(answer, "")
 	if len(words) < 25 {
 		return Analysis{
-			Bad: []string{"Response too short to be processed by AI"},
+			Bad:  []string{"Response too short to be processed by AI"},
 			Good: []string{},
 		}, nil
 	}
@@ -88,4 +99,28 @@ func (o *AI) AnalyseResponse(ctx context.Context, r *QuestionAnswerPair) (Analys
 	json.Unmarshal([]byte(resp.Choices[0].Text), &analysis)
 
 	return analysis, nil
+}
+
+func (o *AI) Voice2Text(ctx context.Context, audioPath string) (Voice2TextResponse, error) {
+
+	// Make the client
+	c := openai.NewClient(o.Key)
+
+	// Create the request
+	req := openai.AudioRequest{
+
+		Model:    openai.Whisper1,
+		FilePath: audioPath,
+	}
+
+	resp, err := c.CreateTranscription(ctx, req)
+
+	if err != nil {
+		// TODO fix this -> figure out the correct way to handle errors
+		return Voice2TextResponse{}, err
+	}
+
+	return Voice2TextResponse{
+		Text: resp.Text,
+	}, nil
 }

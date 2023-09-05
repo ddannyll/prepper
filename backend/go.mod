@@ -5,13 +5,19 @@ go 1.21.0
 require (
 	github.com/SafetyCulture/s12-apis-go v1.211.21
 	github.com/SafetyCulture/soter-jwt-go/v3 v3.5.2
+	github.com/go-playground/validator/v10 v10.15.3
 	github.com/gofiber/fiber v1.14.6
 	github.com/gofiber/fiber/v2 v2.49.0
+	github.com/gofiber/swagger v0.1.12
 	github.com/iancoleman/strcase v0.0.0-20190422225806-e506e3ef7365
 	github.com/joho/godotenv v1.5.1
+	github.com/sashabaranov/go-openai v1.15.1
 	github.com/shopspring/decimal v1.3.1
 	github.com/steebchen/prisma-client-go v0.21.0
+	github.com/swaggo/swag v1.16.2
 	github.com/takuoki/gocase v1.0.0
+	go.uber.org/fx v1.20.0
+	golang.org/x/crypto v0.12.0
 	golang.org/x/text v0.12.0
 	google.golang.org/grpc v1.57.0
 )
@@ -33,8 +39,6 @@ require (
 	github.com/go-openapi/swag v0.22.4 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
-	github.com/go-playground/validator/v10 v10.15.3 // indirect
-	github.com/gofiber/swagger v0.1.12 // indirect
 	github.com/gofiber/utils v0.0.10 // indirect
 	github.com/gofrs/uuid v4.2.0+incompatible // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
@@ -51,12 +55,10 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rivo/uniseg v0.4.4 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
-	github.com/sashabaranov/go-openai v1.15.1 // indirect
 	github.com/shurcooL/sanitized_anchor_name v1.0.0 // indirect
 	github.com/stretchr/objx v0.5.0 // indirect
 	github.com/stretchr/testify v1.8.4 // indirect
 	github.com/swaggo/files/v2 v2.0.0 // indirect
-	github.com/swaggo/swag v1.16.2 // indirect
 	github.com/urfave/cli/v2 v2.25.7 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasthttp v1.49.0 // indirect
@@ -65,10 +67,8 @@ require (
 	github.com/xrash/smetrics v0.0.0-20201216005158-039620a65673 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
 	go.uber.org/dig v1.17.0 // indirect
-	go.uber.org/fx v1.20.0 // indirect
 	go.uber.org/multierr v1.6.0 // indirect
 	go.uber.org/zap v1.23.0 // indirect
-	golang.org/x/crypto v0.12.0 // indirect
 	golang.org/x/net v0.14.0 // indirect
 	golang.org/x/sys v0.11.0 // indirect
 	golang.org/x/tools v0.12.0 // indirect
