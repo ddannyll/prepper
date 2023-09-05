@@ -8,18 +8,23 @@ import (
 	"github.com/ddannyll/prepper/pkg/config"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/session"
+	"github.com/golang-jwt/jwt"
+
 	"golang.org/x/crypto/bcrypt"
 )
 
 type UserHandler struct {
 	SessionStore *session.Store
 	dbClient     *db.PrismaClient
+	jwtSecret    string
 }
 
 func NewUserHandler(sessionStore *session.Store, config config.EnvVars, dbClient *db.PrismaClient) *UserHandler {
 	return &UserHandler{
 		SessionStore: sessionStore,
-		dbClient:     dbClient}
+		dbClient:     dbClient,
+		jwtSecret:    config.JWT_SECRET,
+	}
 }
 
 type userCredentialsBody struct {
@@ -28,7 +33,8 @@ type userCredentialsBody struct {
 } //@name UserCredentials
 
 type userSigninSuccessResponse struct {
-	Id string `json:"id" example:"1337"`
+	Id          string `json:"id" example:"1337"`
+	AccessToken string `json:"access_token"`
 } //@name UserSigninResponse
 
 // SignUp godoc
@@ -65,19 +71,24 @@ func (u *UserHandler) SignUpUser(c *fiber.Ctx) error {
 		return createError
 	}
 
-	sess, err := u.SessionStore.Get(c)
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"user_id": createdUser.ID,
+		"auth":    true,
+	})
+
+	tokenString, err := token.SignedString([]byte(u.jwtSecret))
+
 	if err != nil {
-		return err
-	}
-	sess.Set("auth", true)
-	sess.Set("user_id", createdUser.ID)
-	sess.Save()
 
-	resp := userSigninSuccessResponse{
-		Id: fmt.Sprint(createdUser.ID),
+		log.Println(err)
+		return fiber.NewError(fiber.StatusUnauthorized, "invalid username and/or password")
 	}
 
-	return c.JSON(resp)
+	return c.JSON(userSigninSuccessResponse{
+		Id:          fmt.Sprint(createdUser.ID),
+		AccessToken: tokenString,
+	})
+
 }
 
 // Signin godoc
@@ -93,35 +104,7 @@ func (u *UserHandler) SignUpUser(c *fiber.Ctx) error {
 //	@Router		/user/signin [post]
 func (u *UserHandler) SignInUser(c *fiber.Ctx) error {
 
-	// TODO - fully cooked - there is no password, you can sign in as long as the username exists
-	var user userCredentialsBody
-	if err := parseAndValidateBody(c, &user); err != nil {
-		return err
-	}
-
-	// TODO fix this, we are scanning the DB here
-	userFromStorage, findErr := u.dbClient.User.FindUnique(
-		db.User.Username.Equals(user.Username),
-	).Exec(c.Context())
-
-	if findErr != nil {
-		return fiber.NewError(fiber.StatusUnauthorized, "invalid username and/or password")
-	}
-
-	sess, err := u.SessionStore.Get(c)
-
-	if err != nil {
-		return err
-	}
-	sess.Set("auth", true)
-	sess.Set("user_id", userFromStorage.ID)
-	if err := sess.Save(); err != nil {
-		return err
-	}
-
-	return c.JSON(userSigninSuccessResponse{
-		Id: fmt.Sprint(userFromStorage.ID),
-	})
+	return nil
 }
 
 // SignOut godoc

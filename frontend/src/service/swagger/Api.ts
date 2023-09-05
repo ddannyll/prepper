@@ -47,6 +47,7 @@ export interface UserCredentials {
 }
 
 export interface UserSigninResponse {
+  access_token?: string;
   /** @example "1337" */
   id?: string;
 }
@@ -360,11 +361,13 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @name PingList
      * @summary Ping the server
      * @request GET:/ping
+     * @secure
      */
     pingList: (params: RequestParams = {}) =>
       this.request<string, any>({
         path: `/ping`,
         method: "GET",
+        secure: true,
         type: ContentType.Json,
         ...params,
       }),
