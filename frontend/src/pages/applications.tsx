@@ -2,6 +2,7 @@ import { Transition } from "@headlessui/react";
 import { HomeIcon, UsersIcon } from "@heroicons/react/24/outline";
 import { IconMinus, IconPlus } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
+import JobApplicationForm from "@/components/inputs/JobApplicationForm";
 
 const navigation = [
   { name: "My Applications", href: "#", icon: HomeIcon, current: true },
@@ -117,12 +118,7 @@ export default function ApplicationPage() {
               leaveTo="opacity-0"
             >
               <div className="mt-4">
-                This is a lil form to create an Application
-                {/* TODO FORM*/}
-                <form className="bg-white p-4 rounded shadow">
-                  {/* Form fields go here */}
-                  <input type="text" placeholder="Company Name" />
-                </form>
+                <JobApplicationForm />
               </div>
             </Transition>
           </div>
