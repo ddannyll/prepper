@@ -54,7 +54,14 @@ export default function Home() {
               setValue={setKeyboardVal}
               className={!keyboardOn ? "opacity-0 transition" : "transition"}
             />
-            {micOn && <AudioRecorder />}
+            {micOn && (
+              <AudioRecorder
+                setText={(tex: string) => {
+                  setKeyboardOn(true);
+                  setKeyboardVal(tex);
+                }}
+              />
+            )}
           </div>
           <AnswerControls
             onMicClick={() => {

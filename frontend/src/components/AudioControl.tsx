@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 
 const mimeType = "audio/webm";
 
-const AudioRecorder = () => {
+const AudioRecorder = ({ setText }: { setText: (text: string) => void }) => {
   const [permission, setPermission] = useState(false);
 
   const mediaRecorder = useRef<any>(null);
@@ -13,7 +13,7 @@ const AudioRecorder = () => {
   const [audioChunks, setAudioChunks] = useState([]);
   const [audio, setAudio] = useState<any>(null);
 
-  const [transcript, setTranscript] = useState("");
+  const [requesting, setRequesting] = useState(false);
 
   const startRecording = async () => {
     setRecordingStatus("recording");
@@ -50,7 +50,7 @@ const AudioRecorder = () => {
           body: audioBlob,
         });
         const data = await response.json();
-        setTranscript(data.text);
+        setText(data.text);
         console.log(data);
       }
     })();
@@ -86,14 +86,9 @@ const AudioRecorder = () => {
       alert("The MediaRecorder API is not supported in your browser.");
     }
   };
+
   return (
     <div className="audio-controls">
-      {transcript !== "" && (
-        <div className="p-2 w-full border-2 shadow-lg rounded-md mb-2">
-          {" "}
-          {transcript}
-        </div>
-      )}
       {!permission ? (
         <button onClick={getMicrophonePermission} type="button">
           Get Microphone
