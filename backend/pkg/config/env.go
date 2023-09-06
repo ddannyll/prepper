@@ -10,6 +10,7 @@ type EnvVars struct {
 	LISTEN_ON   string
 	PORT        string
 	GATEWAY_KEY string
+	JWT_SECRET  string
 }
 
 func LoadEnv() EnvVars {
@@ -26,9 +27,16 @@ func LoadEnv() EnvVars {
 	if !exists {
 		port = "8080"
 	}
+
+	_, jwtExists := os.LookupEnv("JWT_SECRET")
+	if !jwtExists {
+		panic("Failed to load environment variables! Is .env setup correctly?")
+	}
+
 	return EnvVars{
 		LISTEN_ON:   listenOn,
 		PORT:        port,
 		GATEWAY_KEY: os.Getenv("OPENAI_API_KEY"),
+		JWT_SECRET:  os.Getenv("JWT_SECRET"),
 	}
 }

@@ -21,17 +21,23 @@ const CustomForm = () => {
         password: data.password,
       });
 
-      console.log(response);
+      console.log(response.data);
 
-      if (response.ok) {
+      const jsonData = response.data;
+      console.log(jsonData);
+
+      if (response.ok && jsonData.access_token) {
+        // store the access token in the local storage
+        localStorage.setItem("token", jsonData.access_token);
         // Handle successful API response here
         // add a redirect
         router.push("/applications");
-
-        //
       } else {
         // Handle API errors here
-        console.error("API error:", response.statusText);
+        console.error(
+          "API error:",
+          response.statusText || "something went wrong"
+        );
       }
     } catch (error) {
       console.error("Error:", error);
