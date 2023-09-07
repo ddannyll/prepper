@@ -47,21 +47,7 @@ type applicationCreateSuccessResponse struct {
 //	@Router			/application/create [post]
 func (u *ApplicationHandler) ApplicationCreate(c *fiber.Ctx) error {
 
-	// TODO for the user create an application.
-	// TODO add rate limits here so users don't abuse the system.
-	// TODO ge the user ID !
-
-	// this is a post request
-
-	sess, err := u.SessionStore.Get(c)
-	if err != nil || sess.Get("auth") != true {
-		return fiber.NewError(fiber.StatusUnauthorized, "unauthorized")
-	}
-
-	userID, ok := sess.Get("user_id").(string)
-	if !ok {
-		return fiber.NewError(fiber.StatusUnauthorized, "unauthorized")
-	}
+	userID := c.Locals("userID").(string)
 
 	var application applicationCreateBody
 	if err := parseAndValidateBody(c, &application); err != nil {
