@@ -1,8 +1,11 @@
+import NewApplication from "@/components/applications/NewApplication";
 import { backendAPI } from "@/service/API";
 import { Transition } from "@headlessui/react";
 import { HomeIcon, UsersIcon } from "@heroicons/react/24/outline";
 import { IconMinus, IconPlus } from "@tabler/icons-react";
+import Link from "next/link";
 import { useEffect, useState } from "react";
+import { set } from "react-hook-form";
 
 const navigation = [
   { name: "My Applications", href: "#", icon: HomeIcon, current: true },
@@ -15,11 +18,33 @@ function classNames(...classes: string[]) {
 
 export default function ApplicationPage() {
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [applications, setApplications] = useState<any[] | null>([]);
 
   const handleButtonClick = () => {
     console.log("clicked");
     setIsFormOpen(!isFormOpen);
   };
+
+  // run an async function here to get all the applications.
+
+  useEffect(() => {
+    const getApplications = async () => {
+      const token = localStorage.getItem("token");
+      console.log("get applications");
+      console.log(token);
+      const response = await backendAPI.application.getApplication({
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const ddd = await response.json();
+
+      console.log(ddd);
+      setApplications(ddd);
+    };
+
+    getApplications();
+  }, []);
 
   console.log(isFormOpen);
 
@@ -118,14 +143,64 @@ export default function ApplicationPage() {
               leaveTo="opacity-0"
             >
               <div className="mt-4">
-                This is a lil form to create an Application
-                {/* TODO FORM*/}
-                <form className="bg-white p-4 rounded shadow">
-                  {/* Form fields go here */}
-                  <input type="text" placeholder="Company Name" />
-                </form>
+                <NewApplication
+                  setOpen={setIsFormOpen}
+                  setApplications={setApplications}
+                />
               </div>
             </Transition>
+          </div>
+          <div className="w-full">
+            <h1> Applications </h1>
+
+            <div className="w-full">
+              {/* make a table from the applications */}
+
+              <table className="table-auto w-full border-separate border-spacing-2 border border-slate-500 text-center">
+                <thead>
+                  <tr>
+                    <th>Application Name</th>
+                    <th>Application Description</th>
+
+                    <th>CreatedAt</th>
+                    <th>Link</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {applications?.map((application) => {
+                    // format created at nicely
+                    const createdAt = new Date(
+                      application.createdAt
+                    ).toLocaleDateString("en-US", {
+                      hour: "numeric",
+                      dayPeriod: "short",
+
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    });
+
+                    return (
+                      <>
+                        <tr>
+                          <td>{application.name}</td>
+                          <td>{application.description}</td>
+                          <th>{createdAt}</th>
+                          <td>
+                            <Link
+                              href={`/applications/${application.id}`}
+                              className="text-blue-500"
+                            >
+                              go here{" "}
+                            </Link>
+                          </td>
+                        </tr>
+                      </>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           </div>
         </main>
       </div>

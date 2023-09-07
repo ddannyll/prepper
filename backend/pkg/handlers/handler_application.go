@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"log"
+
 	"github.com/ddannyll/prepper/db"
 	"github.com/ddannyll/prepper/pkg/config"
 	"github.com/gofiber/fiber/v2"
@@ -32,6 +34,7 @@ type applicationCreateSuccessResponse struct {
 	Name           string `json:"name" validate:"required" example:"SafetyCulture"`
 	Description    string `json:"description" example:"SafetyCulture is an Australian-based global technology company that specialises in building inspection apps for the web and mobile devices."`
 	JobDescription string `json:"jobDescription" validate:"required" example:"Looking for an engineer to join our team."`
+	CreatedAt      string `json:"createdAt" example:"2021-07-01T00:00:00.000Z"`
 	Icon           string `json:"icon" example:"https://www.safetyculture.com/wp-content/uploads/2020/10/safetyculture-logo.svg"`
 } //@name ApplicationCreateResponse
 
@@ -55,10 +58,10 @@ func (u *ApplicationHandler) ApplicationCreate(c *fiber.Ctx) error {
 	}
 
 	createdApplication, createError := u.dbClient.Application.CreateOne(
-		db.Application.Name.Set("test"),
-		db.Application.Description.Set("test"),
-		db.Application.JobDescription.Set("test"),
-		db.Application.Icon.Set("test"),
+		db.Application.Name.Set(application.Name),
+		db.Application.Description.Set(application.Description),
+		db.Application.JobDescription.Set(application.JobDescription),
+		db.Application.Icon.Set(application.Icon),
 
 		db.Application.Owner.Link(
 			db.User.ID.Equals(userID),
@@ -74,6 +77,7 @@ func (u *ApplicationHandler) ApplicationCreate(c *fiber.Ctx) error {
 		Name:           createdApplication.Name,
 		Description:    createdApplication.Description,
 		JobDescription: createdApplication.JobDescription,
+		CreatedAt:      createdApplication.CreatedAt.String(),
 		Icon:           "",
 	}
 
@@ -90,24 +94,26 @@ func (u *ApplicationHandler) ApplicationCreate(c *fiber.Ctx) error {
 //	@Failure	401
 //	@Router		/application/me [get]
 func (u *ApplicationHandler) ApplicationMe(c *fiber.Ctx) error {
+	userID := c.Locals("userID").(string)
 
-	// TODO for the user create an application.
-	// TODO add rate limits here so users don't abuse the system.
-	// TODO ge the user ID !
-
-	sess, err := u.SessionStore.Get(c)
-	if err != nil || sess.Get("auth") != true {
-		return fiber.NewError(fiber.StatusUnauthorized, "unauthorized")
-	}
-	userID, ok := sess.Get("user_id").(string)
-	if !ok {
-		return fiber.NewError(fiber.StatusUnauthorized, "unauthorized")
+	if userID == "" {
+		log.Println("userID is empty")
+		return fiber.ErrUnauthorized
 	}
 
+	// applications, fetchError := u.dbClient.Application.FindMany(
+	// 	db.Application.Owner.Where(
+	// 		db.User.ID.Equals(userID),
+	// 	),
+	// ).Exec(c.Context())
+
+	// find many order by created at desc
 	applications, fetchError := u.dbClient.Application.FindMany(
 		db.Application.Owner.Where(
 			db.User.ID.Equals(userID),
 		),
+	).OrderBy(
+		db.Application.CreatedAt.Order(db.DESC),
 	).Exec(c.Context())
 
 	if fetchError != nil {

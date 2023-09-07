@@ -1,3 +1,4 @@
+import { useUser } from "@/context/UserContext";
 import { backendAPI } from "@/service/API";
 import { Router, useRouter } from "next/router";
 import { useState } from "react";
@@ -12,6 +13,9 @@ const CustomForm = () => {
   const [isLoading, setIsLoading] = useState(false); // State to manage the submit button loading state
 
   const router = useRouter();
+
+  const { login } = useUser();
+
   const onSubmit: SubmitHandler<LoginForm> = async (data) => {
     setIsLoading(true); // Set loading state when the form is submitted
 
@@ -26,9 +30,14 @@ const CustomForm = () => {
       const jsonData = response.data;
       console.log(jsonData);
 
-      if (response.ok && jsonData.access_token) {
+      if (response.ok && jsonData.access_token && jsonData.id) {
         // store the access token in the local storage
         localStorage.setItem("token", jsonData.access_token);
+
+        login({
+          username: "Test User",
+          id: jsonData.id,
+        });
         // Handle successful API response here
         // add a redirect
         router.push("/applications");
