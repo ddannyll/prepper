@@ -46,9 +46,6 @@ const NewApplication = (props: {
         // Handle successful API response here
         // add a redirect
 
-        console.log("SUCCESS");
-        console.log(response.data);
-
         props.setApplications((prev) => {
           if (prev) {
             return [

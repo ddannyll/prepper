@@ -1,4 +1,5 @@
 import { Question } from "@/hooks/useQuestionPlayer";
+import { backendAPI } from "./API";
 
 interface QuestionFetcher {
   getQuestions: (interviewId: string) => Promise<Question[]>; // todo: replace this with neo's types
@@ -30,8 +31,37 @@ export class MockQuestionFetcher implements QuestionFetcher {
   ];
 
   async getQuestions(interviewId: string) {
-    console.log(`mocking interview: ${interviewId}`);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    return this.mockQuestions;
+    try {
+      // fetch from the backend
+      console.log(`mocking interview: ${interviewId}`);
+
+      const resp = await backendAPI.application.questionsCreate(
+        {
+          id: interviewId,
+          numberQuestions: 5,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
+        }
+      );
+
+      const jsonString: string = resp.data.text;
+
+      console.log(jsonString);
+
+      try {
+        return JSON.parse(jsonString);
+      } catch (e) {
+        console.log(jsonString);
+        console.error("Failed to parse JSON:", e);
+        return this.mockQuestions;
+      }
+    } catch (e) {
+      console.log(e);
+      return this.mockQuestions;
+    }
   }
 }

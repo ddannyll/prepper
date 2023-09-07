@@ -24,6 +24,8 @@ export interface ApplicationCreateBody {
 }
 
 export interface ApplicationCreateResponse {
+  /** @example "2021-07-01T00:00:00.000Z" */
+  createdAt?: string;
   /** @example "SafetyCulture is an Australian-based global technology company that specialises in building inspection apps for the web and mobile devices." */
   description?: string;
   /** @example "https://www.safetyculture.com/wp-content/uploads/2020/10/safetyculture-logo.svg" */
@@ -51,6 +53,15 @@ export interface UserSigninResponse {
   /** @example "1337" */
   id?: string;
 }
+
+export interface ApplicationQuestionsBody {
+  /** @example "1337" */
+  id?: string;
+  /** @example 5 */
+  numberQuestions?: number;
+}
+
+export type ApplicationQuestionsSuccessResponse = object;
 
 export interface HandlersAnalysisRequest {
   answer?: string;
@@ -350,6 +361,24 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       this.request<void, void>({
         path: `/application/me`,
         method: "GET",
+        ...params,
+      }),
+
+    /**
+     * @description an application has some properties
+     *
+     * @tags application
+     * @name QuestionsCreate
+     * @summary Get questoins for the user
+     * @request POST:/application/questions
+     */
+    questionsCreate: (applicationQuestionsBody: ApplicationQuestionsBody, params: RequestParams = {}) =>
+      this.request<ApplicationQuestionsSuccessResponse, any>({
+        path: `/application/questions`,
+        method: "POST",
+        body: applicationQuestionsBody,
+        type: ContentType.Json,
+        format: "json",
         ...params,
       }),
   };

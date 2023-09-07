@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"strings"
 
 	"github.com/ddannyll/prepper/pkg/config"
@@ -122,5 +123,45 @@ func (o *AI) Voice2Text(ctx context.Context, audioPath string) (Voice2TextRespon
 
 	return Voice2TextResponse{
 		Text: resp.Text,
+	}, nil
+}
+
+type GetQuestionsFromJobDescriptionResponse struct {
+	Text string `json:"text"`
+}
+
+func (o *AI) GetQuestionsFromJobDescription(ctx context.Context, jobDescription string, numberOfQuestions int, companyName string) (GetQuestionsFromJobDescriptionResponse, error) {
+
+	// Make the client
+
+	completionRequest := openai.CompletionRequest{
+		Model:     openai.GPT3TextDavinci003,
+		MaxTokens: 2000,
+		Prompt: fmt.Sprintf("You are a senior hiring manager at %s. Create %d question(s) for this job description, with atleast 1 question about the company itself: %s\nReturn question in JSON array only:\n{questionPrompt, tags}\n here questionPrompt is a single sentence and tags is an array containing tags which describe this question.\n Again, don't write anything but JSON array, don't put any random text at the start", companyName,
+			numberOfQuestions, jobDescription),
+		Temperature: 0,
+	}
+
+	c := openai.NewClient(o.Key)
+
+	resp, err := c.CreateCompletion(ctx, completionRequest)
+
+	if err != nil {
+		// TODO fix this -> figure out the correct way to handle errors
+		return GetQuestionsFromJobDescriptionResponse{}, err
+	}
+
+	// delete all text before the first [
+
+	tt := resp.Choices[0].Text
+	tt = tt[strings.Index(resp.Choices[0].Text, "["):]
+
+	// delete all text after the last ]
+	tt = tt[:strings.LastIndex(tt, "]")+1]
+
+	log.Println(resp.Choices[0].Text)
+
+	return GetQuestionsFromJobDescriptionResponse{
+		Text: tt,
 	}, nil
 }

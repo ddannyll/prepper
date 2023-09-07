@@ -116,6 +116,40 @@
                 }
             }
         },
+        "/application/questions": {
+            "post": {
+                "description": "an application has some properties",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "application"
+                ],
+                "summary": "Get questoins for the user",
+                "parameters": [
+                    {
+                        "description": "Application",
+                        "name": "applicationQuestionsBody",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/applicationQuestionsBody"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/applicationQuestionsSuccessResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/ping": {
             "get": {
                 "security": [
@@ -283,6 +317,10 @@
                 "name"
             ],
             "properties": {
+                "createdAt": {
+                    "type": "string",
+                    "example": "2021-07-01T00:00:00.000Z"
+                },
                 "description": {
                     "type": "string",
                     "example": "SafetyCulture is an Australian-based global technology company that specialises in building inspection apps for the web and mobile devices."
@@ -334,6 +372,22 @@
                     "example": "1337"
                 }
             }
+        },
+        "applicationQuestionsBody": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "example": "1337"
+                },
+                "numberQuestions": {
+                    "type": "integer",
+                    "example": 5
+                }
+            }
+        },
+        "applicationQuestionsSuccessResponse": {
+            "type": "object"
         },
         "handlers.AnalysisRequest": {
             "type": "object",

@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"fmt"
+	"log"
 	"strings"
 
 	"github.com/ddannyll/prepper/pkg/config"
@@ -23,6 +24,8 @@ func NewAuthMiddleware(store *session.Store,
 }
 
 func (a *AuthMiddleware) AuthenticateRoute(c *fiber.Ctx) error {
+
+	log.Println("Hi Auth")
 
 	authHeader := c.Get("Authorization")
 

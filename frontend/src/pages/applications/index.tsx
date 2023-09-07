@@ -5,7 +5,6 @@ import { HomeIcon, UsersIcon } from "@heroicons/react/24/outline";
 import { IconMinus, IconPlus } from "@tabler/icons-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { set } from "react-hook-form";
 
 const navigation = [
   { name: "My Applications", href: "#", icon: HomeIcon, current: true },
@@ -167,7 +166,7 @@ export default function ApplicationPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {applications?.map((application) => {
+                  {applications?.map((application, i) => {
                     // format created at nicely
                     const createdAt = new Date(
                       application.createdAt
@@ -182,7 +181,7 @@ export default function ApplicationPage() {
 
                     return (
                       <>
-                        <tr>
+                        <tr key={`${i}-${application.name}`}>
                           <td>{application.name}</td>
                           <td>{application.description}</td>
                           <th>{createdAt}</th>

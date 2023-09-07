@@ -21,6 +21,9 @@ definitions:
     type: object
   ApplicationCreateResponse:
     properties:
+      createdAt:
+        example: "2021-07-01T00:00:00.000Z"
+        type: string
       description:
         example: SafetyCulture is an Australian-based global technology company that
           specialises in building inspection apps for the web and mobile devices.
@@ -61,6 +64,17 @@ definitions:
       id:
         example: "1337"
         type: string
+    type: object
+  applicationQuestionsBody:
+    properties:
+      id:
+        example: "1337"
+        type: string
+      numberQuestions:
+        example: 5
+        type: integer
+    type: object
+  applicationQuestionsSuccessResponse:
     type: object
   handlers.AnalysisRequest:
     properties:
@@ -160,6 +174,28 @@ paths:
         "401":
           description: Unauthorized
       summary: Get user's applications
+      tags:
+      - application
+  /application/questions:
+    post:
+      consumes:
+      - application/json
+      description: an application has some properties
+      parameters:
+      - description: Application
+        in: body
+        name: applicationQuestionsBody
+        required: true
+        schema:
+          $ref: '#/definitions/applicationQuestionsBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/applicationQuestionsSuccessResponse'
+      summary: Get questoins for the user
       tags:
       - application
   /ping:
