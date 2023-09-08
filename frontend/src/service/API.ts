@@ -1,7 +1,7 @@
 import { Api } from "./swagger/Api";
 
 export const backendAPI = new Api({
-  baseUrl: "http://localhost:8080",
+  baseUrl: process.env.BACKEND_URL || "httpL//localhost:8080",
 });
 
-export const BASE_URL = "http://localhost:8080";
+export const BASE_URL = process.env.BACKEND_URL || "http://localhost:8080";
