@@ -6,6 +6,8 @@ COPY . .
 
 RUN go get
 
+RUN go run github.com/steebchen/prisma-client-go db push
+
 ENV LISTEN_ON=0.0.0.0
 
 ENV PORT=8080
