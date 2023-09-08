@@ -7,6 +7,7 @@ import Image from 'next/image'
 import { UserContext, useUser } from '@/context/UserContext'
 import { backendAPI } from '@/service/API'
 import Button from '@/components/ui-kit/Button'
+import { useEffect } from 'react'
 
 type LoginInputs = {
     username: string
@@ -22,6 +23,9 @@ export default function Login() {
   const {login} = useUser()
   const { register, handleSubmit, formState: {errors} } = useForm<LoginInputs>()
 
+  useEffect(() => {
+    alert("username: daniel\n password:daniel321")
+  }, [])
   const onSubmit: SubmitHandler<LoginInputs> = async data => {
     console.log(data)
     const res = await backendAPI.user.signinCreate(data)
