@@ -103,8 +103,27 @@ func (u *UserHandler) SignUpUser(c *fiber.Ctx) error {
 //	@Failure	401	"Invalid Credentials"
 //	@Router		/user/signin [post]
 func (u *UserHandler) SignInUser(c *fiber.Ctx) error {
-
-	return nil
+	var user userCredentialsBody
+	if err := parseAndValidateBody(c, &user); err != nil {
+		return err
+	}
+	userFromDB, err := u.dbClient.User.FindUnique(db.User.Username.Equals(user.Username)).Exec(c.Context())	
+	if err != nil {
+		return fiber.NewError(fiber.StatusUnauthorized,"incorrect login")
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"user_id": userFromDB.ID,
+		"auth":    true,
+	})
+	tokenString, err := token.SignedString([]byte(u.jwtSecret))
+	if err != nil {
+		log.Println(err)
+		return fiber.NewError(fiber.StatusUnauthorized, "invalid username and/or password")
+	}
+	return c.JSON(userSigninSuccessResponse{
+		Id: userFromDB.ID,	
+		AccessToken: tokenString,
+	})
 }
 
 // SignOut godoc
