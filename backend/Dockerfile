@@ -4,6 +4,9 @@ WORKDIR /app
 
 COPY . .
 
+
+RUN go run github.com/steebchen/prisma-client-go db push
+
 RUN go get
 
 ENV LISTEN_ON=0.0.0.0
