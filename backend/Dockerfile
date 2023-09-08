@@ -1,6 +1,6 @@
 FROM golang:1.21
 
-WORKDIR /app
+WORKDIR /apps
 
 COPY . .
 
@@ -20,4 +20,4 @@ EXPOSE 8080
 
 RUN go build -o bin .
 
-ENTRYPOINT [ "/app/bin" ]
+ENTRYPOINT [ "/apps/bin" ]
