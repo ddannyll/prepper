@@ -3,8 +3,6 @@ module github.com/ddannyll/prepper
 go 1.21.0
 
 require (
-	github.com/SafetyCulture/s12-apis-go v1.211.21
-	github.com/SafetyCulture/soter-jwt-go/v3 v3.5.2
 	github.com/go-playground/validator/v10 v10.15.3
 	github.com/gofiber/fiber v1.14.6
 	github.com/gofiber/fiber/v2 v2.49.0
@@ -27,7 +25,6 @@ require (
 	github.com/KyleBanks/depth v1.2.1 // indirect
 	github.com/PuerkitoBio/purell v1.2.0 // indirect
 	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 // indirect
-	github.com/SafetyCulture/s12-proto v1.29.0 // indirect
 	github.com/SermoDigital/jose v0.9.2-0.20161205224733-f6df55f235c2 // indirect
 	github.com/andybalholm/brotli v1.0.5 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
@@ -80,7 +77,5 @@ require (
 	gopkg.in/square/go-jose.v2 v2.6.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	sc-go.io/pkg/credentials v0.2.0 // indirect
-	sc-go.io/pkg/jwtclaims v1.7.0 // indirect
 	sigs.k8s.io/yaml v1.3.0 // indirect
 )
