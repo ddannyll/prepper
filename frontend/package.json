@@ -2,10 +2,6 @@
   "name": "frontend",
   "version": "0.1.0",
   "private": true,
-  "engines": {
-    "npm": "9.x",
-    "node": "18.x"
-  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -49,9 +45,10 @@
     "@types/uuid": "^9.0.3",
     "@typescript-eslint/eslint-plugin": "^6.5.0",
     "@typescript-eslint/parser": "^6.5.0",
-    "eslint": "8.48.0",
+    "eslint": "^8.48.0",
     "eslint-config-next": "13.4.19",
     "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-only-warn": "^1.1.0",
     "eslint-plugin-storybook": "^0.6.13",
     "storybook": "^7.4.0",
     "typescript": "5.2.2"
