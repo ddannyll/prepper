@@ -1,16 +1,13 @@
 FROM golang:1.21
 
-WORKDIR /apps
+WORKDIR /app
 
 COPY . .
 
-RUN go get
-
-RUN ls
 
 RUN go run github.com/steebchen/prisma-client-go db push
 
-RUN ls
+RUN go get
 
 ENV LISTEN_ON=0.0.0.0
 
@@ -20,4 +17,4 @@ EXPOSE 8080
 
 RUN go build -o bin .
 
-ENTRYPOINT [ "/apps/bin" ]
+ENTRYPOINT [ "/app/bin" ]
