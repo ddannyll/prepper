@@ -1,3 +1,5 @@
+import { cn } from "@/lib/utils";
+
 interface IconButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children?: React.ReactNode;
@@ -18,7 +20,9 @@ export default function Button({children, size="md", className, variant="primary
     tertiary: "text-blue-600 hover:bg-blue-100",
     danger: "bg-red-500 text-red-50 hover:bg-red-400",
   }
-  return <button className={`${buttonClasses} ${sizeClasses[size]} ${variantClasses[variant]} ${className}`} {...props}>
+  return <button 
+    className={cn(buttonClasses, sizeClasses[size], variantClasses[variant], className)}
+    {...props}>
     {children}
   </button>
 }
