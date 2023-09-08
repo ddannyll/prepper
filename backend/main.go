@@ -89,7 +89,7 @@ func newFiberServer(
 	AIGroup.Get("/getQuestions", aiHandler.GetQuestions)
 	AIGroup.Post("/analyse", aiHandler.Analyse)
 	AIGroup.Post("/voice2text", aiHandler.Voice2Text)
-	AIGroup.Post("/text2voice", handlers.GetAudio)
+	AIGroup.Post("/dynamicQuestions", aiHandler.DynamicQuestions)
 
 	// applicationGroup.Get("/myapplications", authMiddleware.AuthenticateRoute)
 

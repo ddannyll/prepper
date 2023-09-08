@@ -22,6 +22,8 @@ require (
 	google.golang.org/grpc v1.57.0
 )
 
+require github.com/haguro/elevenlabs-go v0.2.2 // indirect
+
 require (
 	bitbucket.org/atlassian/go-asap v0.0.0-20190921160616-bb88d6193af9 // indirect
 	github.com/KyleBanks/depth v1.2.1 // indirect

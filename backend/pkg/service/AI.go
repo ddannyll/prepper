@@ -6,10 +6,8 @@ import (
 	"fmt"
 	"log"
 	"strings"
-	"time"
 
 	"github.com/ddannyll/prepper/pkg/config"
-	"github.com/haguro/elevenlabs-go"
 	"github.com/sashabaranov/go-openai"
 )
 
@@ -168,21 +166,29 @@ func (o *AI) GetQuestionsFromJobDescription(ctx context.Context, jobDescription 
 	}, nil
 }
 
-func Text2Voice(questionread string) ([]byte, error) {
-	// Create a new client
-	client := elevenlabs.NewClient(context.Background(), "e290e9a38b37ac5e39577ec36c35b1d3", 30*time.Second)
+type DynamicQuestion struct {
+	CoverLetter string
+	Resume      string
+}
 
-	// Create a TextToSpeechRequest
-	ttsReq := elevenlabs.TextToSpeechRequest{
-		Text:    questionread,
-		ModelID: "eleven_monolingual_v1",
+func (o *AI) GetDynamicQuestions(ctx context.Context, i *DynamicQuestion) (string, error) {
+
+	coverLetter := i.CoverLetter
+	resume := i.Resume
+
+	completionRequest := openai.CompletionRequest{
+		Model:       openai.GPT3TextDavinci003,
+		MaxTokens:   2000,
+		Prompt:      fmt.Sprintf("Generate interview questions based on a cover letter and resume:\n\nCover Letter: %s \n\nResume: %s, Return question in JSON array only, don't put any random text at the start", coverLetter, resume),
+		Temperature: 1,
 	}
 
-	// Call the TextToSpeech method on the client, using the "Adam"'s voice ID.
-	audio, err := client.TextToSpeech("pNInz6obpgDQGcFmaJgB", ttsReq)
+	c := openai.NewClient(o.Key)
+
+	resp, err := c.CreateCompletion(ctx, completionRequest)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
-	return audio, nil
+	return resp.Choices[0].Text, nil
 }

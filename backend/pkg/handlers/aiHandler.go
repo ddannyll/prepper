@@ -128,16 +128,35 @@ type AnalysisRequest struct {
 	Answer   string `json:"answer"`
 }
 
-func GetAudio(c *fiber.Ctx) error {
+type DynamicQuestion struct {
+	CoverLetter string `json:"coverletter"`
+	Resume      string `json:"resume"`
+}
 
-	var QuestionRead string
-	audioData, err := service.Text2Voice(QuestionRead)
+// GetQuestions godoc
+//
+//	@Summary	Generate questions given a cover letter and job description
+//	@Tags		ai
+//	@Accept		json
+//	@Produce	plain
+//	@Success	200
+//	@Router		/ai/DynamicQuestions [post]
+
+func (p *AIHandler) DynamicQuestions(c *fiber.Ctx) error {
+	i := &DynamicQuestion{}
+	err := c.BodyParser(i)
 	if err != nil {
-		log.Println(err)
-		return fiber.NewError(fiber.StatusInternalServerError, "failed to process request")
-	}
-	// Send the response back to the client
-	return c.JSON(audioData)
+		fmt.Println(err)
 	}
 
+	questions, err := p.aiService.GetDynamicQuestions(c.Context(), &service.DynamicQuestion{
+		CoverLetter: i.CoverLetter,
+		Resume:      i.Resume,
+	})
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	c.SendString(questions)
+	return nil
 }
