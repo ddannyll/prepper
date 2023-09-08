@@ -11,6 +11,7 @@ type EnvVars struct {
 	PORT        string
 	GATEWAY_KEY string
 	JWT_SECRET  string
+	ELEVEN_LABS string
 }
 
 func LoadEnv() EnvVars {
@@ -38,5 +39,6 @@ func LoadEnv() EnvVars {
 		PORT:        port,
 		GATEWAY_KEY: os.Getenv("OPENAI_API_KEY"),
 		JWT_SECRET:  os.Getenv("JWT_SECRET"),
+		ELEVEN_LABS: os.Getenv("ELEVEN_LABS_KEY"),
 	}
 }

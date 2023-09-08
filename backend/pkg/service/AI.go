@@ -168,9 +168,9 @@ func (o *AI) GetQuestionsFromJobDescription(ctx context.Context, jobDescription 
 	}, nil
 }
 
-func Text2Voice(questionread string) ([]byte, error) {
+func Text2Voice(env config.EnvVars, questionread string) ([]byte, error) {
 	// Create a new client
-	client := elevenlabs.NewClient(context.Background(), "e290e9a38b37ac5e39577ec36c35b1d3", 30*time.Second)
+	client := elevenlabs.NewClient(context.Background(), env.ELEVEN_LABS, 30*time.Second)
 
 	// Create a TextToSpeechRequest
 	ttsReq := elevenlabs.TextToSpeechRequest{
