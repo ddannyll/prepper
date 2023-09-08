@@ -6,8 +6,10 @@ import (
 	"fmt"
 	"log"
 	"strings"
+	"time"
 
 	"github.com/ddannyll/prepper/pkg/config"
+	"github.com/haguro/elevenlabs-go"
 	"github.com/sashabaranov/go-openai"
 )
 
@@ -164,4 +166,23 @@ func (o *AI) GetQuestionsFromJobDescription(ctx context.Context, jobDescription 
 	return GetQuestionsFromJobDescriptionResponse{
 		Text: tt,
 	}, nil
+}
+
+func Text2Voice(questionread string) ([]byte, error) {
+	// Create a new client
+	client := elevenlabs.NewClient(context.Background(), "e290e9a38b37ac5e39577ec36c35b1d3", 30*time.Second)
+
+	// Create a TextToSpeechRequest
+	ttsReq := elevenlabs.TextToSpeechRequest{
+		Text:    questionread,
+		ModelID: "eleven_monolingual_v1",
+	}
+
+	// Call the TextToSpeech method on the client, using the "Adam"'s voice ID.
+	audio, err := client.TextToSpeech("pNInz6obpgDQGcFmaJgB", ttsReq)
+	if err != nil {
+		return nil, err
+	}
+
+	return audio, nil
 }

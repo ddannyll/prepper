@@ -127,3 +127,17 @@ type AnalysisRequest struct {
 	Question string `json:"question"`
 	Answer   string `json:"answer"`
 }
+
+func GetAudio(c *fiber.Ctx) error {
+
+	var QuestionRead string
+	audioData, err := service.Text2Voice(QuestionRead)
+	if err != nil {
+		log.Println(err)
+		return fiber.NewError(fiber.StatusInternalServerError, "failed to process request")
+	}
+	// Send the response back to the client
+	return c.JSON(audioData)
+	}
+
+}
