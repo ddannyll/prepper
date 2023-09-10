@@ -53,18 +53,14 @@ func (u *UserHandler) SignUpUser(c *fiber.Ctx) error {
 		return err
 	}
 
-	// // hashedPassword, err := hashPassword(user.Password)
-	// if err != nil {
-	// 	return fiber.NewError(fiber.StatusBadRequest, "invalid password")
-	// }
-
-	// userId, err := u.Storage.CreateNewUser(storage.NewUser{
-	// 	Username:       user.Username,
-	// 	HashedPassword: hashedPassword,
-	// })
+	hashedPassword, err := hashPassword(user.Password)
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, "invalid password")
+	}
 
 	createdUser, createError := u.dbClient.User.CreateOne(
 		db.User.Username.Set(user.Username),
+		db.User.HashedPassword.Set(hashedPassword),
 	).Exec(c.Context())
 
 	if createError != nil {
@@ -109,26 +105,30 @@ func (u *UserHandler) SignInUser(c *fiber.Ctx) error {
 		return err
 	}
 
+
 	userFromDB, err := u.dbClient.User.FindUnique(db.User.Username.Equals(user.Username)).Exec(c.Context())
-	if err != nil {
-
-		// if user is daniel, create him
-		if user.Username == "daniel" || user.Username == "neosh" {
-
-			u.dbClient.User.CreateOne(
-				db.User.Username.Set(user.Username),
-			).Exec(c.Context())
-
-			// return the user
-			userFromDB, err = u.dbClient.User.FindUnique(db.User.Username.Equals(user.Username)).Exec(c.Context())
-			if err != nil {
-				return err
-			}
-		} else {
-			return fiber.NewError(fiber.StatusUnauthorized, "incorrect login")
-		}
-
-	}
+	// if err != nil {
+	//
+	// 	// if user is daniel, create him
+	// 	if user.Username == "daniel" || user.Username == "neosh" {
+	//
+	// 		u.dbClient.User.CreateOne(
+	// 			db.User.Username.Set(user.Username),
+	// 		).Exec(c.Context())
+	//
+	// 		// return the user
+	// 		userFromDB, err = u.dbClient.User.FindUnique(db.User.Username.Equals(user.Username)).Exec(c.Context())
+	// 		if err != nil {
+	// 			return err
+	// 		}
+	// 	} else {
+	// 		return fiber.NewError(fiber.StatusUnauthorized, "incorrect login")
+	// 	}
+	//
+	// }
+	if err != nil || !checkPasswordHash(user.Password, userFromDB.HashedPassword) {
+		return fiber.NewError(fiber.StatusUnauthorized, "invalid username and/or password")
+	}	
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"user_id": userFromDB.ID,
 		"auth":    true,
@@ -178,19 +178,7 @@ func (u *UserHandler) SignOutUser(c *fiber.Ctx) error {
 //	@Failure	401	"if not signed in"
 //	@Router		/user/healthcheck [get]
 func (u *UserHandler) HealthCheckUser(c *fiber.Ctx) error {
-
-	sess, err := u.SessionStore.Get(c)
-	if err != nil || sess.Get("auth") != true {
-		return fiber.NewError(fiber.StatusUnauthorized, "unauthorized")
-	}
-
-	// TODO - abstract the user_id into a helper function
-	// There is repeated code everywhere -> could we possibly inject the user details into the context?
-	// After it has been passed to the auth middleware?
-
-	log.Println(sess.Get("user_id"))
-
-	return c.JSON(fiber.Map{"success": true})
+	return c.JSON(fiber.Map{"success": true, "userID":c.Locals("userID")})
 }
 
 func hashPassword(password string) (string, error) {

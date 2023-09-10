@@ -63,6 +63,45 @@
                 }
             }
         },
+        "/application/:applicationId/questions": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "application"
+                ],
+                "summary": "Get an user's application question types",
+                "parameters": [
+                    {
+                        "description": "applicationId",
+                        "name": "application",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ApplicationQuestionRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ApplicationQuestionResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "test"
+                    }
+                }
+            }
+        },
         "/application/create": {
             "post": {
                 "description": "an application has some properties",
@@ -112,40 +151,6 @@
                     },
                     "401": {
                         "description": "Unauthorized"
-                    }
-                }
-            }
-        },
-        "/application/questions": {
-            "post": {
-                "description": "an application has some properties",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "application"
-                ],
-                "summary": "Get questoins for the user",
-                "parameters": [
-                    {
-                        "description": "Application",
-                        "name": "applicationQuestionsBody",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/applicationQuestionsBody"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/applicationQuestionsSuccessResponse"
-                        }
                     }
                 }
             }
@@ -291,15 +296,6 @@
                 "name"
             ],
             "properties": {
-                "description": {
-                    "type": "string",
-                    "example": "SafetyCulture is an Australian-based global technology company that specialises in building inspection apps for the web and mobile devices."
-                },
-                "icon": {
-                    "description": "icon link?",
-                    "type": "string",
-                    "example": "https://www.safetyculture.com/wp-content/uploads/2020/10/safetyculture-logo.svg"
-                },
                 "jobDescription": {
                     "type": "string",
                     "example": "Looking for an engineer to join our team."
@@ -307,6 +303,15 @@
                 "name": {
                     "type": "string",
                     "example": "SafetyCulture"
+                },
+                "questions": {
+                    "type": "array",
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
                 }
             }
         },
@@ -320,14 +325,6 @@
                 "createdAt": {
                     "type": "string",
                     "example": "2021-07-01T00:00:00.000Z"
-                },
-                "description": {
-                    "type": "string",
-                    "example": "SafetyCulture is an Australian-based global technology company that specialises in building inspection apps for the web and mobile devices."
-                },
-                "icon": {
-                    "type": "string",
-                    "example": "https://www.safetyculture.com/wp-content/uploads/2020/10/safetyculture-logo.svg"
                 },
                 "id": {
                     "type": "string",
@@ -373,22 +370,6 @@
                 }
             }
         },
-        "applicationQuestionsBody": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "string",
-                    "example": "1337"
-                },
-                "numberQuestions": {
-                    "type": "integer",
-                    "example": 5
-                }
-            }
-        },
-        "applicationQuestionsSuccessResponse": {
-            "type": "object"
-        },
         "handlers.AnalysisRequest": {
             "type": "object",
             "properties": {
@@ -397,6 +378,39 @@
                 },
                 "question": {
                     "type": "string"
+                }
+            }
+        },
+        "handlers.ApplicationQuestionRequest": {
+            "type": "object",
+            "properties": {
+                "Id": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers.ApplicationQuestionResponse": {
+            "type": "object",
+            "properties": {
+                "questions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/handlers.QuestionType"
+                    }
+                }
+            }
+        },
+        "handlers.QuestionType": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 }
             }
         },
@@ -432,5 +446,10 @@
             "name": "Authorization",
             "in": "header"
         }
-    }
+    },
+    "security": [
+        {
+            "ApiKeyAuth": []
+        }
+    ]
 }

@@ -10,26 +10,16 @@
  */
 
 export interface ApplicationCreateBody {
-  /** @example "SafetyCulture is an Australian-based global technology company that specialises in building inspection apps for the web and mobile devices." */
-  description?: string;
-  /**
-   * icon link?
-   * @example "https://www.safetyculture.com/wp-content/uploads/2020/10/safetyculture-logo.svg"
-   */
-  icon?: string;
   /** @example "Looking for an engineer to join our team." */
   jobDescription: string;
   /** @example "SafetyCulture" */
   name: string;
+  questions?: string[][];
 }
 
 export interface ApplicationCreateResponse {
   /** @example "2021-07-01T00:00:00.000Z" */
   createdAt?: string;
-  /** @example "SafetyCulture is an Australian-based global technology company that specialises in building inspection apps for the web and mobile devices." */
-  description?: string;
-  /** @example "https://www.safetyculture.com/wp-content/uploads/2020/10/safetyculture-logo.svg" */
-  icon?: string;
   /** @example "1337" */
   id?: string;
   /** @example "Looking for an engineer to join our team." */
@@ -54,18 +44,22 @@ export interface UserSigninResponse {
   id?: string;
 }
 
-export interface ApplicationQuestionsBody {
-  /** @example "1337" */
-  id?: string;
-  /** @example 5 */
-  numberQuestions?: number;
-}
-
-export type ApplicationQuestionsSuccessResponse = object;
-
 export interface HandlersAnalysisRequest {
   answer?: string;
   question?: string;
+}
+
+export interface HandlersApplicationQuestionRequest {
+  Id?: string;
+}
+
+export interface HandlersApplicationQuestionResponse {
+  questions?: HandlersQuestionType[];
+}
+
+export interface HandlersQuestionType {
+  id?: string;
+  tags?: string[];
 }
 
 export interface ServiceAnalysis {
@@ -303,12 +297,14 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @name AnalyseCreate
      * @summary analyse an answer to a question
      * @request POST:/ai/analyse
+     * @secure
      */
     analyseCreate: (QAPair: HandlersAnalysisRequest, params: RequestParams = {}) =>
       this.request<ServiceAnalysis, any>({
         path: `/ai/analyse`,
         method: "POST",
         body: QAPair,
+        secure: true,
         type: ContentType.Json,
         format: "json",
         ...params,
@@ -321,16 +317,42 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @name Voice2TextCreate
      * @summary convert voice to text
      * @request POST:/ai/voice2text
+     * @secure
      */
     voice2TextCreate: (params: RequestParams = {}) =>
       this.request<ServiceVoice2TextResponse, any>({
         path: `/ai/voice2text`,
         method: "POST",
+        secure: true,
         format: "json",
         ...params,
       }),
   };
   application = {
+    /**
+     * No description
+     *
+     * @tags application
+     * @name ApplicationIdQuestionsList
+     * @summary Get an user's application question types
+     * @request GET:/application/:applicationId/questions
+     * @secure
+     */
+    applicationIdQuestionsList: (
+      applicationId: string,
+      application: HandlersApplicationQuestionRequest,
+      params: RequestParams = {},
+    ) =>
+      this.request<HandlersApplicationQuestionResponse, void>({
+        path: `/application/${applicationId}/questions`,
+        method: "GET",
+        body: application,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
     /**
      * @description an application has some properties
      *
@@ -338,12 +360,14 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @name CreateCreate
      * @summary Create an application for the user
      * @request POST:/application/create
+     * @secure
      */
     createCreate: (ApplicationCreateBody: ApplicationCreateBody, params: RequestParams = {}) =>
       this.request<ApplicationCreateResponse, any>({
         path: `/application/create`,
         method: "POST",
         body: ApplicationCreateBody,
+        secure: true,
         type: ContentType.Json,
         format: "json",
         ...params,
@@ -356,29 +380,13 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @name GetApplication
      * @summary Get user's applications
      * @request GET:/application/me
+     * @secure
      */
     getApplication: (params: RequestParams = {}) =>
       this.request<void, void>({
         path: `/application/me`,
         method: "GET",
-        ...params,
-      }),
-
-    /**
-     * @description an application has some properties
-     *
-     * @tags application
-     * @name QuestionsCreate
-     * @summary Get questoins for the user
-     * @request POST:/application/questions
-     */
-    questionsCreate: (applicationQuestionsBody: ApplicationQuestionsBody, params: RequestParams = {}) =>
-      this.request<ApplicationQuestionsSuccessResponse, any>({
-        path: `/application/questions`,
-        method: "POST",
-        body: applicationQuestionsBody,
-        type: ContentType.Json,
-        format: "json",
+        secure: true,
         ...params,
       }),
   };
@@ -409,11 +417,13 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @name HealthcheckList
      * @summary Check if a user is signed in
      * @request GET:/user/healthcheck
+     * @secure
      */
     healthcheckList: (params: RequestParams = {}) =>
       this.request<void, void>({
         path: `/user/healthcheck`,
         method: "GET",
+        secure: true,
         ...params,
       }),
 
@@ -424,12 +434,14 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @name SigninCreate
      * @summary Sign a user
      * @request POST:/user/signin
+     * @secure
      */
     signinCreate: (SignInBody: UserCredentials, params: RequestParams = {}) =>
       this.request<UserSigninResponse, void>({
         path: `/user/signin`,
         method: "POST",
         body: SignInBody,
+        secure: true,
         type: ContentType.Json,
         format: "json",
         ...params,
@@ -442,11 +454,13 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @name SignoutCreate
      * @summary Sign a user out of dancord
      * @request POST:/user/signout
+     * @secure
      */
     signoutCreate: (params: RequestParams = {}) =>
       this.request<void, any>({
         path: `/user/signout`,
         method: "POST",
+        secure: true,
         ...params,
       }),
 
@@ -457,12 +471,14 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @name SignupCreate
      * @summary Sign a user up to dancord
      * @request POST:/user/signup
+     * @secure
      */
     signupCreate: (SignUpBody: UserCredentials, params: RequestParams = {}) =>
       this.request<UserSigninResponse, any>({
         path: `/user/signup`,
         method: "POST",
         body: SignUpBody,
+        secure: true,
         type: ContentType.Json,
         format: "json",
         ...params,
