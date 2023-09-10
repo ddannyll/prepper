@@ -5,20 +5,20 @@ import { IconPlus} from '@tabler/icons-react'
 import { cn } from '@/lib/utils'
 import { HTTPApplicatonFetcher } from '@/service/aplicationFetcher'
 import { useMutation, useQuery } from '@tanstack/react-query'
+import { useRouter } from 'next/router'
 
 const applicationFetcher = new HTTPApplicatonFetcher()
 export default function Sidebar() {
+  const router = useRouter()
   const {data: applications, } = useQuery({
     queryKey: ["applications"],
     queryFn: async () => {
       return await applicationFetcher.fetchUserApplications()
     }
   })
-  const mutation = useMutation({
-    mutationFn: async () => {
-      return await applicationFetcher.newApplication()
-    }
-  })
+  const gotoNewApplication = () => {
+    router.push('/applications/new')
+  }
   return <div className="h-full min-w-[225px] py-4 px-6 bg-white shadow">
     <Image
       src={Logo}
@@ -37,7 +37,10 @@ export default function Sidebar() {
     //   </SidebarButton> 
     // </ul>
     }
-    <button className='flex items-center justify-between w-full gap-2 px-4 py-2 my-6 rounded-md text-gray-500 font-medium text-xs hover:bg-gray-100'>
+    <button 
+      className='flex items-center justify-between w-full gap-2 px-4 py-2 my-6 rounded-md text-gray-500 font-medium text-xs hover:bg-gray-100'
+      onClick={gotoNewApplication}
+    >
       Applications
       <IconPlus className='h-3.5 w-3.5 rounded-sm '/>
     </button>
