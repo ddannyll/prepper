@@ -131,9 +131,11 @@ func (o *AI) GetCuratedQuestions(ctx context.Context, companyName string, jobDes
 	// Make the client
 
 	questionsTagsPrompt := ""
-	for questionTags := range questionsTags {
+	for _, questionTags := range questionsTags {
+		fmt.Println(questionTags)
 		questionsTagsPrompt = fmt.Sprintf("%s\n- 1 '%v' question", questionsTagsPrompt, questionTags)
 	}
+	fmt.Printf("---\n%v\n", questionsTagsPrompt)
 	
 	completionRequest := openai.CompletionRequest{
 		Model:     openai.GPT3TextDavinci003,

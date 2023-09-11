@@ -6,6 +6,7 @@ import { useState } from "react"
 import { v4 as uuid } from "uuid"
 import { HTTPApplicatonFetcher } from "@/service/aplicationFetcher"
 import { useToast } from "@/components/ui/use-toast"
+import { useQueryClient } from "@tanstack/react-query"
 interface FormValues {
   jobName: string
   jobDescription: string
@@ -25,6 +26,7 @@ export default function NewApplication() {
     newQuestions[i] = {...newQuestions[i], tags}
     setQuestions(newQuestions)
   }
+  const queryClient = useQueryClient()
   const onSubmit:SubmitHandler<FormValues> = async (data) => {
     console.log(data)
     console.log(questions)
@@ -34,6 +36,7 @@ export default function NewApplication() {
         jobDescription: data.jobDescription,
         questions: questions.map(q => q.tags)
       })
+      queryClient.invalidateQueries({queryKey: ['applications']})
     } catch (err) {
       toast({
         variant: "destructive",
@@ -41,6 +44,7 @@ export default function NewApplication() {
       })
     // TODO: replace with backend call 
     }}
+  
 
   const {register, handleSubmit} = useForm<FormValues>()
   return <form onSubmit={handleSubmit(onSubmit)} className="w-full h-full flex flex-col gap-5 items-center p-10">
