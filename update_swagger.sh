@@ -4,7 +4,7 @@
 cd backend
 # --- Perform database migration ---
 go run github.com/steebchen/prisma-client-go db push
-$(go env GOPATH)/bin/swag init --dir ./,./pkg
+$(go env GOPATH)/bin/swag init --parseDependency --dir ./,./pkg
 
 cd ../frontend
 

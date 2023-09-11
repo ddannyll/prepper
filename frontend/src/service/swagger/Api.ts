@@ -44,13 +44,19 @@ export interface UserSigninResponse {
   id?: string;
 }
 
+export interface DbInnerApplication {
+  createdAt?: string;
+  id?: string;
+  jobDescription?: string;
+  name?: string;
+  ownerId?: string;
+  updatedAt?: string;
+  url?: string;
+}
+
 export interface HandlersAnalysisRequest {
   answer?: string;
   question?: string;
-}
-
-export interface HandlersApplicationQuestionRequest {
-  Id?: string;
 }
 
 export interface HandlersApplicationQuestionResponse {
@@ -338,15 +344,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @request GET:/application/:applicationId/questions
      * @secure
      */
-    applicationIdQuestionsList: (
-      applicationId: string,
-      application: HandlersApplicationQuestionRequest,
-      params: RequestParams = {},
-    ) =>
+    applicationIdQuestionsList: (applicationId: string, params: RequestParams = {}) =>
       this.request<HandlersApplicationQuestionResponse, void>({
         path: `/application/${applicationId}/questions`,
         method: "GET",
-        body: application,
         secure: true,
         type: ContentType.Json,
         format: "json",
@@ -383,10 +384,11 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @secure
      */
     getApplication: (params: RequestParams = {}) =>
-      this.request<void, void>({
+      this.request<DbInnerApplication[], void>({
         path: `/application/me`,
         method: "GET",
         secure: true,
+        format: "json",
         ...params,
       }),
   };

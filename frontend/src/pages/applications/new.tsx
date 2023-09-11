@@ -4,12 +4,16 @@ import Button from "@/components/ui-kit/Button"
 import QuestionTypeWithTags from "@/components/QuestionTypeWithTags"
 import { useState } from "react"
 import { v4 as uuid } from "uuid"
+import { HTTPApplicatonFetcher } from "@/service/aplicationFetcher"
+import { useToast } from "@/components/ui/use-toast"
 interface FormValues {
   jobName: string
   jobDescription: string
 }
+const applicationFetcher = new HTTPApplicatonFetcher()
 export default function NewApplication() {
   const [questions, setQuestions] = useState<{tags: string[]}[]>([{tags:[]}])
+  const {toast} = useToast()
   const newQuestion = () => {
     setQuestions([...questions, {tags:[]}])
   }
@@ -21,11 +25,22 @@ export default function NewApplication() {
     newQuestions[i] = {...newQuestions[i], tags}
     setQuestions(newQuestions)
   }
-  const onSubmit:SubmitHandler<FormValues> = (data) => {
+  const onSubmit:SubmitHandler<FormValues> = async (data) => {
     console.log(data)
     console.log(questions)
+    try {
+      await applicationFetcher.newApplication({
+        name: data.jobName,
+        jobDescription: data.jobDescription,
+        questions: questions.map(q => q.tags)
+      })
+    } catch (err) {
+      toast({
+        variant: "destructive",
+        title: "Failed to create application",
+      })
     // TODO: replace with backend call 
-  }
+    }}
 
   const {register, handleSubmit} = useForm<FormValues>()
   return <form onSubmit={handleSubmit(onSubmit)} className="w-full h-full flex flex-col gap-5 items-center p-10">
@@ -55,7 +70,6 @@ export default function NewApplication() {
   </form>
 }  
 
-interface LabelProps extends React.ComponentProps<'label'> {} 
-function Label({children}: LabelProps) {
+function Label({children}: React.ComponentProps<'label'>) {
   return <label className="self-start text-gray-600 font-bold text-xl">{children}</label>
 }

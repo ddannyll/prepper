@@ -30,38 +30,7 @@ export class MockQuestionFetcher implements QuestionFetcher {
     },
   ];
 
-  async getQuestions(interviewId: string) {
-    try {
-      // fetch from the backend
-      console.log(`mocking interview: ${interviewId}`);
-
-      const resp = await backendAPI.application.questionsCreate(
-        {
-          id: interviewId,
-          numberQuestions: 5,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + localStorage.getItem("token"),
-          },
-        }
-      );
-
-      const jsonString: string = resp.data.text;
-
-      console.log(jsonString);
-
-      try {
-        return JSON.parse(jsonString);
-      } catch (e) {
-        console.log(jsonString);
-        console.error("Failed to parse JSON:", e);
-        return this.mockQuestions;
-      }
-    } catch (e) {
-      console.log(e);
-      return this.mockQuestions;
-    }
+  async getQuestions(applicationId: string) {
+    return this.mockQuestions
   }
 }

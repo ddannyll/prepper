@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils'
 import { HTTPApplicatonFetcher } from '@/service/aplicationFetcher'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { useRouter } from 'next/router'
-
+import Link from 'next/link'
 const applicationFetcher = new HTTPApplicatonFetcher()
 export default function Sidebar() {
   const router = useRouter()
@@ -38,15 +38,16 @@ export default function Sidebar() {
     // </ul>
     }
     <button 
-      className='flex items-center justify-between w-full gap-2 px-4 py-2 my-6 rounded-md text-gray-500 font-medium text-xs hover:bg-gray-100'
+      className='flex items-center justify-between w-full gap-2 px-4 py-2 mt-6 rounded-md text-gray-600 font-medium text-xs hover:bg-gray-100'
       onClick={gotoNewApplication}
     >
       Applications
       <IconPlus className='h-3.5 w-3.5 rounded-sm '/>
     </button>
-    <ul>
+    <hr className='my-1 mx-2'/>
+    <ul className='gap-1 flex flex-col'>
       {
-        applications?.map(app => <SidebarButton key={app.id}>
+        applications?.map(app => <SidebarButton key={app.id} href={`/applications/${app.id}`}>
           {app.name}
         </SidebarButton>)
       }
@@ -56,15 +57,20 @@ export default function Sidebar() {
 
 interface SidebarButton extends React.ComponentProps<'button'>{
   highlighted?: boolean
+  href?: string
 }
-function SidebarButton({highlighted=false, children}: SidebarButton) {
+function SidebarButton({highlighted=false, children, href, ...props}: SidebarButton) {
   return <li>
-    <Button 
-      variant='tertiary' 
-      className={cn('py-1 w-full flex gap-2 text-left text-gray-500', {
-        "bg-blue-100": highlighted
-      })}>
-      {children} 
-    </Button>   
+    <Link href={href || ""}>
+      <Button 
+        variant='tertiary' 
+        className={cn('py-1 w-full flex gap-2 text-left text-gray-400 text-sm hover:text-blue-900', {
+          "bg-blue-100": highlighted,
+        })}
+        {...props}
+      >
+        {children} 
+      </Button>   
+    </Link>
   </li>
 }

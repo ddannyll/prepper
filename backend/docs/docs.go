@@ -85,13 +85,11 @@ const docTemplate = `{
                 "summary": "Get an user's application question types",
                 "parameters": [
                     {
+                        "type": "string",
                         "description": "applicationId",
-                        "name": "application",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/handlers.ApplicationQuestionRequest"
-                        }
+                        "name": "applicationId",
+                        "in": "path",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -155,7 +153,13 @@ const docTemplate = `{
                 "summary": "Get user's applications",
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/db.InnerApplication"
+                            }
+                        }
                     },
                     "401": {
                         "description": "Unauthorized"
@@ -378,6 +382,32 @@ const docTemplate = `{
                 }
             }
         },
+        "db.InnerApplication": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "jobDescription": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "ownerId": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                },
+                "url": {
+                    "type": "string"
+                }
+            }
+        },
         "handlers.AnalysisRequest": {
             "type": "object",
             "properties": {
@@ -385,14 +415,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "question": {
-                    "type": "string"
-                }
-            }
-        },
-        "handlers.ApplicationQuestionRequest": {
-            "type": "object",
-            "properties": {
-                "Id": {
                     "type": "string"
                 }
             }

@@ -29,13 +29,13 @@ func NewApplicationHandler(
 	}
 }
 
-type applicationCreateBody struct {
+type ApplicationCreateBody struct {
 	Name           string `json:"name" validate:"required" example:"SafetyCulture"`
 	JobDescription string `json:"jobDescription" validate:"required" example:"Looking for an engineer to join our team."`
 	Questions  [][]string `json:"questions"`
 } //@name ApplicationCreateBody
 
-type applicationCreateSuccessResponse struct {
+type ApplicationCreateSuccessResponse struct {
 	Id string `json:"id" example:"1337"`
 
 	Name           string `json:"name" validate:"required" example:"SafetyCulture"`
@@ -49,15 +49,15 @@ type applicationCreateSuccessResponse struct {
 //	@description	an application has some properties
 //	@Tags			application
 //	@Accept			json
-//	@Param			ApplicationCreateBody	body applicationCreateBody true "Application"
+//	@Param			ApplicationCreateBody	body ApplicationCreateBody true "Application"
 //	@Produce		json
-//	@Success		200	{object} applicationCreateSuccessResponse
+//	@Success		200	{object} ApplicationCreateSuccessResponse
 //	@Router			/application/create [post]
 func (u *ApplicationHandler) ApplicationCreate(c *fiber.Ctx) error {
 
 	userID := c.Locals("userID").(string)
 
-	var application applicationCreateBody
+	var application ApplicationCreateBody
 	if err := parseAndValidateBody(c, &application); err != nil {
 		return err
 	}
@@ -88,7 +88,7 @@ func (u *ApplicationHandler) ApplicationCreate(c *fiber.Ctx) error {
 		}	
 	}
 
-	resp := applicationCreateSuccessResponse{
+	resp := ApplicationCreateSuccessResponse{
 		Id:             createdApplication.ID,
 		Name:           createdApplication.Name,
 		JobDescription: createdApplication.JobDescription,
@@ -104,7 +104,7 @@ func (u *ApplicationHandler) ApplicationCreate(c *fiber.Ctx) error {
 //	@description
 //	@Tags		application
 //	@Produce	json
-//	@Success	200
+//	@Success	200 {object} []db.InnerApplication
 //	@Failure	401
 //	@Router		/application/me [get]
 func (u *ApplicationHandler) ApplicationMe(c *fiber.Ctx) error {
@@ -139,9 +139,6 @@ func (u *ApplicationHandler) ApplicationMe(c *fiber.Ctx) error {
 	return c.JSON(resp)
 }
 
-type ApplicationQuestionRequest struct {
-	Id string `json:"Id"`
-}
 type QuestionType struct {
 	Id string `json:"id"`
 	Tags []string `json:"tags"`
@@ -155,7 +152,7 @@ type ApplicationQuestionResponse struct {
 //	@description
 //	@Tags		application
 //  @Accept json 
-//  @Param application  body ApplicationQuestionRequest true "applicationId"
+//  @Param applicationId  path  string true "applicationId"
 //	@Produce	json 
 //	@Success	200 {object} ApplicationQuestionResponse  
 //	@Failure	401
@@ -172,7 +169,7 @@ func (u *ApplicationHandler) ApplicationQuestions(c *fiber.Ctx) error {
 	app, err := u.dbClient.Application.FindUnique(
 		db.Application.ID.Equals(appId),
 	).Exec(c.Context())
-	if app.OwnerID != userId || err != nil {
+	if err != nil || app.OwnerID != userId {
 		return fiber.NewError(fiber.StatusForbidden)
 	}
 
