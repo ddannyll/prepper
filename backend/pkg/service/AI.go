@@ -126,19 +126,19 @@ func (o *AI) Voice2Text(ctx context.Context, audioPath string) (Voice2TextRespon
 	}, nil
 }
 
-type GetQuestionsFromJobDescriptionResponse struct {
-	Text string `json:"text"`
-}
-
-func (o *AI) GetQuestionsFromJobDescription(ctx context.Context, jobDescription string, numberOfQuestions int, companyName string) (GetQuestionsFromJobDescriptionResponse, error) {
+func (o *AI) GetCuratedQuestions(ctx context.Context, companyName string, jobDescription string, questionsTags [][]string) ([]string, error) {
 
 	// Make the client
 
+	questionsTagsPrompt := ""
+	for questionTags := range questionsTags {
+		questionsTagsPrompt = fmt.Sprintf("%s\n- 1 '%v' question", questionsTagsPrompt, questionTags)
+	}
+	
 	completionRequest := openai.CompletionRequest{
 		Model:     openai.GPT3TextDavinci003,
 		MaxTokens: 2000,
-		Prompt: fmt.Sprintf("You are a senior hiring manager at %s. Create %d question(s) for this job description, with atleast 1 question about the company itself: %s\nReturn question in JSON array only:\n{questionPrompt, tags}\n here questionPrompt is a single sentence and tags is an array containing tags which describe this question.\n Again, don't write anything but JSON array, don't put any random text at the start", companyName,
-			numberOfQuestions, jobDescription),
+		Prompt: fmt.Sprintf("You are a senior hiring manager at %s. Given the following job description: \n\n---%s---\n\n Curate single sentence interview questions according to below:\n%s\n\n format the questions into a JSON array of strings, removing the question type. Only return JSON, do not put any random text around the JSON.", companyName, jobDescription,questionsTagsPrompt), 		
 		Temperature: 0,
 	}
 
@@ -148,7 +148,7 @@ func (o *AI) GetQuestionsFromJobDescription(ctx context.Context, jobDescription 
 
 	if err != nil {
 		// TODO fix this -> figure out the correct way to handle errors
-		return GetQuestionsFromJobDescriptionResponse{}, err
+		return []string{}, err
 	}
 
 	// delete all text before the first [
@@ -161,7 +161,11 @@ func (o *AI) GetQuestionsFromJobDescription(ctx context.Context, jobDescription 
 
 	log.Println(resp.Choices[0].Text)
 
-	return GetQuestionsFromJobDescriptionResponse{
-		Text: tt,
-	}, nil
+	
+	res := []string{}
+	
+	if jsonErr :=	json.Unmarshal([]byte(tt), &res); jsonErr != nil {
+		return res, jsonErr
+	}
+	return res, nil
 }

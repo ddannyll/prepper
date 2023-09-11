@@ -5,17 +5,27 @@ import Keyboard from "@/components/Keyboard";
 import QuestionCard from "@/components/QuestionCard";
 import useQuestionPlayer, { Question } from "@/hooks/useQuestionPlayer";
 import { useQuestionReader } from "@/hooks/useQuestionReader";
-import { MockQuestionFetcher } from "@/service/questionFetcher";
+import { HTTPQuestionFetcher, MockQuestionFetcher } from "@/service/questionFetcher";
+import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
-const questionService = new MockQuestionFetcher();
+const questionService = new HTTPQuestionFetcher();
 
 const InterviewPage = () => {
   const router = useRouter();
 
   const [keyboardOn, setKeyboardOn] = useState(false);
-  const [questions, setQuestions] = useState<Question[]>([]);
+
+  const applicationId = router.query.applicationId as string
+  const { data:questions, isLoading } = useQuery({
+    queryKey: ['interview', applicationId],
+    queryFn: async () => {
+      return await questionService.getQuestions(applicationId)
+    },
+    refetchOnWindowFocus: false
+  })
+
   const {
     finished,
     currQuestion,
@@ -24,33 +34,23 @@ const InterviewPage = () => {
     questionAnswerPairs,
     advanceQuestion,
     submitAndAdvance,
-  } = useQuestionPlayer({ questions });
+  } = useQuestionPlayer({ questions: questions || []});
   const { read, currWordIndex } = useQuestionReader({
     question: currQuestion?.questionPrompt || "",
   });
+  useEffect(() => {
+    read()
+  }, [currQuestion, read])
   const [keyboardVal, setKeyboardVal] = useState("");
   const [micOn, setMicOn] = useState(false);
-
-  console.log(questions);
-
-  useEffect(() => {
-    const getQuestions = async () => {
-      if (router.query.slug) {
-        setQuestions(
-          await questionService.getQuestions(router.query.slug as string)
-        );
-      }
-    };
-    getQuestions();
-  }, [router.query.slug]);
-
-  useEffect(() => {
-    read();
-  }, [currQuestion, read]);
-
-  if (!currQuestion) {
-    return <div>loading</div>;
+  
+  if (isLoading) {
+    return <div>loading</div>
   }
+  if (questions?.length === 0) {
+    return <div>error</div>
+  }
+
 
   if (!finished) {
     return (

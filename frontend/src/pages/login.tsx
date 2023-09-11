@@ -23,9 +23,6 @@ export default function Login() {
   const {login} = useUser()
   const { register, handleSubmit, formState: {errors} } = useForm<LoginInputs>()
 
-  useEffect(() => {
-    alert("username: daniel\n password:daniel321")
-  }, [])
   const onSubmit: SubmitHandler<LoginInputs> = async data => {
     console.log(data)
     const res = await backendAPI.user.signinCreate(data)
@@ -82,6 +79,7 @@ export default function Login() {
                         Register
             </Link>
           </p>
+        Dummy Account: daniel, daniel321
         </form>
       </div>
       <Image src={BG} alt='background graphic' className='absolute w-screen h-screen object-cover'/>

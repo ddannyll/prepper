@@ -1,8 +1,6 @@
 import { backendAPI } from "./API"
 import { ApplicationCreateBody } from "./swagger/Api"
 
-interface applicationFetcher {
-}
 
 export class HTTPApplicatonFetcher {
   async fetchUserApplications () {
@@ -14,9 +12,7 @@ export class HTTPApplicatonFetcher {
         },
       }
     )
-    console.log(applications.data)
-    console.log(applications)
-    return applications.data
+    return applications.data// idk why this requires.json() when others can use .data
   }
   async newApplication(application: ApplicationCreateBody) {
     const newApp = await backendAPI.application.createCreate(
@@ -29,5 +25,17 @@ export class HTTPApplicatonFetcher {
       }
     )
     return newApp
+  }
+  async fetchApplicationQuestions(id: string) {
+    const questions = await backendAPI.application.applicationIdQuestionsList(
+      id,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+      }
+    )
+    return questions.data
   }
 }

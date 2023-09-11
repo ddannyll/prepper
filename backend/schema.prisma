@@ -15,6 +15,7 @@ model User {
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
     username  String   @unique
+    hashed_password String 
 
     applications Application[]
 }
@@ -26,57 +27,66 @@ model Application {
     updatedAt DateTime @updatedAt
 
     name           String
-    description    String
     jobDescription String
 
     // keep url optional
     url  String?
-    icon String
 
     owner   User   @relation(fields: [ownerId], references: [id])
     ownerId String
 
-    stages ApplicationStage[]
+    questionTypes QuestionType[] 
 }
 
-// n to 1 relation from stages to apps
-model ApplicationStage {
-    id String @id @default(cuid())
+model QuestionType {
+    id    String @id @default(cuid())
+    tags String[]
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+    number Int
 
-    name           String
-    description    String
-    jobDescription String
-
-    application   Application @relation(fields: [applicationId], references: [id])
+    application Application @relation(fields: [applicationId], references: [id])
     applicationId String
 }
 
-model Question {
-    id    Int    @id @default(autoincrement())
-    title String
+// REMOVE EVERYTHING BELOW BECAUSE CANT BE FKED DOING MULTIPLE STAGES IN FRONTEND - DANIEL
+// n to 1 relation from stages to apps
+// model ApplicationStage {
+//     id String @id @default(cuid())
+//
+//     createdAt DateTime @default(now())
+//     updatedAt DateTime @updatedAt
+//
+//     name           String
+//     description    String
+//     jobDescription String
+//
+//     application   Application @relation(fields: [applicationId], references: [id])
+//     applicationId String
+// }
 
-    categories CategoriesOnQuestion[]
-}
-
-// categories are like ['behavioral', 'system design', 'algorithms', etc.]
-model Category {
-    id    String                 @id
-    name  String
-    posts CategoriesOnQuestion[]
-}
-
-model CategoriesOnQuestion {
-    questionBank Question @relation(fields: [questionId], references: [id])
-    questionId   Int
-
-    category   Category @relation(fields: [categoryId], references: [id])
-    categoryId String
-
-    assignedAt DateTime @default(now())
-    assignedBy String
-
-    @@id([categoryId, questionId])
-}
+// model Question {
+//     id    Int    @id @default(autoincrement())
+//     title String
+//
+//     categories CategoriesOnQuestion[]
+// }
+//
+// // categories are like ['behavioral', 'system design', 'algorithms', etc.]
+// model Category {
+//     id    String                 @id
+//     name  String
+//     posts CategoriesOnQuestion[]
+// }
+//
+// model CategoriesOnQuestion {
+//     questionBank Question @relation(fields: [questionId], references: [id])
+//     questionId   Int
+//
+//     category   Category @relation(fields: [categoryId], references: [id])
+//     categoryId String
+//
+//     assignedAt DateTime @default(now())
+//     assignedBy String
+//
+//     @@id([categoryId, questionId])
+// }

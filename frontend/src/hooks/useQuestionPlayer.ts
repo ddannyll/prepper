@@ -56,8 +56,8 @@ export default function useQuestionPlayer({
     advanceQuestion()
   } 
 
-  const currQuestion = questions[currQuestionIndex]
-  const currAnswer = questionAnswerPairs[currQuestionIndex]?.answer
+  const currQuestion = questions.length > 0 ? questions[currQuestionIndex] : null
+  const currAnswer = questions.length > 0 ? questionAnswerPairs[currQuestionIndex]?.answer : null
   const currQuestionNum = currQuestionIndex + 1;
   const totalQuestionNum = questions.length;
 
