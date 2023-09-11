@@ -63,6 +63,11 @@ export interface HandlersApplicationQuestionResponse {
   questions?: HandlersQuestionType[];
 }
 
+export interface HandlersGeneratedQuestion {
+  questionPrompt?: string;
+  tags?: string[];
+}
+
 export interface HandlersQuestionType {
   id?: string;
   tags?: string[];
@@ -349,7 +354,24 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         path: `/application/${applicationId}/questions`,
         method: "GET",
         secure: true,
-        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags application
+     * @name ApplicationIdQuestionsGenerateList
+     * @summary Use AI to generate questions based on questions tags in a specified application
+     * @request GET:/application/:applicationId/questions/generate
+     * @secure
+     */
+    applicationIdQuestionsGenerateList: (applicationId: string, params: RequestParams = {}) =>
+      this.request<HandlersGeneratedQuestion[], void>({
+        path: `/application/${applicationId}/questions/generate`,
+        method: "GET",
+        secure: true,
         format: "json",
         ...params,
       }),

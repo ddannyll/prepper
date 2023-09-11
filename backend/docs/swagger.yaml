@@ -87,6 +87,15 @@ definitions:
           $ref: '#/definitions/handlers.QuestionType'
         type: array
     type: object
+  handlers.GeneratedQuestion:
+    properties:
+      questionPrompt:
+        type: string
+      tags:
+        items:
+          type: string
+        type: array
+    type: object
   handlers.QuestionType:
     properties:
       id:
@@ -157,8 +166,6 @@ paths:
       - ai
   /application/:applicationId/questions:
     get:
-      consumes:
-      - application/json
       parameters:
       - description: applicationId
         in: path
@@ -177,6 +184,31 @@ paths:
         "403":
           description: test
       summary: Get an user's application question types
+      tags:
+      - application
+  /application/:applicationId/questions/generate:
+    get:
+      parameters:
+      - description: applicationId
+        in: path
+        name: applicationId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/handlers.GeneratedQuestion'
+            type: array
+        "401":
+          description: Unauthorized
+        "403":
+          description: test
+      summary: Use AI to generate questions based on questions tags in a specified
+        application
       tags:
       - application
   /application/create:

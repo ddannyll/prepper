@@ -5,12 +5,12 @@ import Keyboard from "@/components/Keyboard";
 import QuestionCard from "@/components/QuestionCard";
 import useQuestionPlayer, { Question } from "@/hooks/useQuestionPlayer";
 import { useQuestionReader } from "@/hooks/useQuestionReader";
-import { MockQuestionFetcher } from "@/service/questionFetcher";
+import { HTTPQuestionFetcher, MockQuestionFetcher } from "@/service/questionFetcher";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
-const questionService = new MockQuestionFetcher();
+const questionService = new HTTPQuestionFetcher();
 
 const InterviewPage = () => {
   const router = useRouter();
@@ -20,8 +20,8 @@ const InterviewPage = () => {
   const applicationId = router.query.applicationId as string
   const { data:questions, isLoading } = useQuery({
     queryKey: ['interview', applicationId],
-    queryFn: () => {
-      return questionService.getQuestions(applicationId)
+    queryFn: async () => {
+      return await questionService.getQuestions(applicationId)
     },
     refetchOnWindowFocus: false
   })

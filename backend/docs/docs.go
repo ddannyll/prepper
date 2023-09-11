@@ -73,9 +73,6 @@ const docTemplate = `{
         },
         "/application/:applicationId/questions": {
             "get": {
-                "consumes": [
-                    "application/json"
-                ],
                 "produces": [
                     "application/json"
                 ],
@@ -97,6 +94,43 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/handlers.ApplicationQuestionResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "test"
+                    }
+                }
+            }
+        },
+        "/application/:applicationId/questions/generate": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "application"
+                ],
+                "summary": "Use AI to generate questions based on questions tags in a specified application",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "applicationId",
+                        "name": "applicationId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/handlers.GeneratedQuestion"
+                            }
                         }
                     },
                     "401": {
@@ -426,6 +460,20 @@ const docTemplate = `{
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/handlers.QuestionType"
+                    }
+                }
+            }
+        },
+        "handlers.GeneratedQuestion": {
+            "type": "object",
+            "properties": {
+                "questionPrompt": {
+                    "type": "string"
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
                     }
                 }
             }

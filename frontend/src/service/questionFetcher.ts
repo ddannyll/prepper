@@ -34,3 +34,18 @@ export class MockQuestionFetcher implements QuestionFetcher {
     return this.mockQuestions
   }
 }
+
+export class HTTPQuestionFetcher implements QuestionFetcher{
+  async getQuestions(applicationId: string) {
+    const resp = await backendAPI.application.applicationIdQuestionsGenerateList(
+      applicationId,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+      }
+    )
+    return resp.data as Question[]
+  }
+}

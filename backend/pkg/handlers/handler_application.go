@@ -151,10 +151,9 @@ type ApplicationQuestionResponse struct {
 //	@Summary	Get an user's application question types
 //	@description
 //	@Tags		application
-//  @Accept json 
 //  @Param applicationId  path  string true "applicationId"
 //	@Produce	json 
-//	@Success	200 {object} ApplicationQuestionResponse  
+//	@Success	200 {object} ApplicationQuestionResponse
 //	@Failure	401
 //  @Failure  403 "test"
 //	@Router		/application/:applicationId/questions [get]
@@ -188,4 +187,63 @@ func (u *ApplicationHandler) ApplicationQuestions(c *fiber.Ctx) error {
 		})
 	}
 	return c.JSON(response)
+}
+
+type GeneratedQuestion struct {
+	Tags []string `json:"tags"`
+	QuestionPrompt string `json:"questionPrompt"`
+}
+// GetAIQuestions godoc
+//
+//	@Summary	Use AI to generate questions based on questions tags in a specified application
+//	@description
+//	@Tags		application
+//  @Param applicationId  path  string true "applicationId"
+//	@Produce	json 
+//	@Success	200 {object} []GeneratedQuestion  
+//	@Failure	401
+//  @Failure  403 "test"
+//	@Router		/application/:applicationId/questions/generate [get]
+func (u *ApplicationHandler) GetAIQuestions(c *fiber.Ctx) error {
+	userId := c.Locals("userID").(string)
+	if userId == "" {
+		return fiber.ErrUnauthorized
+	}
+	appId := c.Params("applicationId")
+	app, err := u.dbClient.Application.FindUnique(
+		db.Application.ID.Equals(appId),
+	).Exec(c.Context())
+	if err != nil || app.OwnerID != userId {
+		return fiber.NewError(fiber.StatusForbidden)
+	}
+
+	questionsTags, err := u.dbClient.QuestionType.FindMany(
+		db.QuestionType.ApplicationID.Equals(app.ID),
+	).OrderBy(db.QuestionType.Number.Order(db.ASC)).Exec(c.Context())
+	if err != nil {
+	  return err
+	}
+
+	questions := [][]string{}
+	for _, questionTags := range questionsTags {
+		questions = append(questions, questionTags.Tags)
+	}
+
+	curatedQuestions, err := u.aiService.GetCuratedQuestions(c.Context(), app.Name, app.JobDescription, questions)
+	if err != nil {
+		return err
+	}
+
+	if len(curatedQuestions) != len(questions) {
+		return fiber.ErrInternalServerError
+	}
+	curatedQuestionsTagged := []GeneratedQuestion{}
+	for i, curatedQuestion := range curatedQuestions {
+		curatedQuestionsTagged = append(curatedQuestionsTagged, GeneratedQuestion{
+			QuestionPrompt: curatedQuestion,
+			Tags: questions[i],
+		})
+	}
+
+	return c.JSON(curatedQuestionsTagged)
 }
