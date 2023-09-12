@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"log"
+	"sync"
 
 	"github.com/ddannyll/prepper/db"
 	"github.com/ddannyll/prepper/pkg/config"
@@ -74,19 +75,26 @@ func (u *ApplicationHandler) ApplicationCreate(c *fiber.Ctx) error {
 		return createError 
 	}
 	
+	wg := sync.WaitGroup{}
+	wg.Add(len(application.Questions))
+
 	for i, q := range application.Questions {
 		// i cant find a "createMany" for goPrisma => could do this with go routines?
-		_, err := u.dbClient.QuestionType.CreateOne(
-			db.QuestionType.Number.Set(i + 1),
-			db.QuestionType.Application.Link(
-				db.Application.ID.Equals(createdApplication.ID),
-			),
-			db.QuestionType.Tags.Set(q),
-		).Exec(c.Context())
-		if err != nil {
-			log.Println("failed to create question")
-		}	
+		go func(wg *sync.WaitGroup, questionNumber int, questionTags []string) {
+			defer wg.Done()
+			_, err := u.dbClient.QuestionType.CreateOne(
+				db.QuestionType.Number.Set(questionNumber),
+				db.QuestionType.Application.Link(
+					db.Application.ID.Equals(createdApplication.ID),
+				),
+				db.QuestionType.Tags.Set(questionTags),
+			).Exec(c.Context())
+			if err != nil {
+				log.Println("failed to create question")
+			}	
+		}(&wg, i + 1, q)
 	}
+	wg.Wait()
 
 	resp := ApplicationCreateSuccessResponse{
 		Id:             createdApplication.ID,

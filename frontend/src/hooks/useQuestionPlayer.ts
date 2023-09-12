@@ -17,25 +17,17 @@ export default function useQuestionPlayer({
   questions,
 }: useQuestionPlayerArgs) {
   const [currQuestionIndex, setCurrQuestionIndex] = useState(0);
-  const [questionAnswerPairs, setQuestionAnswersPairs] = useState<QuestionAnswerPair[]>([])
   const [finished, setFinished] = useState(false)
-
-  useEffect(() => {
-    setQuestionAnswersPairs(questions.map(q => ({question: q, answer: ""})))
-  }, [questions])
+  const [answers, setAnswers] = useState<string[]>([...Array(questions.length).fill("")])
 
   const submitAnswer = (answer: string) => {
     console.log(questionAnswerPairs)
     if (finished) {
       return
     }
-    const newQAPairs = [...questionAnswerPairs]
-    const newQAPair = {
-      ...newQAPairs[currQuestionIndex],
-      answer
-    }
-    newQAPairs[currQuestionIndex] = newQAPair 
-    setQuestionAnswersPairs(newQAPairs)
+    const newAnswers = [...answers]
+    newAnswers[currQuestionIndex] = answer
+    setAnswers(newAnswers)
   }
   const advanceQuestion = () => {
     if (finished) {
@@ -57,9 +49,13 @@ export default function useQuestionPlayer({
   } 
 
   const currQuestion = questions.length > 0 ? questions[currQuestionIndex] : null
-  const currAnswer = questions.length > 0 ? questionAnswerPairs[currQuestionIndex]?.answer : null
+  const currAnswer = answers.length > 0 ? answers[currQuestionIndex] : null
   const currQuestionNum = currQuestionIndex + 1;
   const totalQuestionNum = questions.length;
+  const questionAnswerPairs = useMemo(() => questions.map((q, i) => ({
+    question: q,
+    answer: answers[i]
+  })), [questions, answers])
 
   return {
     currQuestion,

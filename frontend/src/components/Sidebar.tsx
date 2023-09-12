@@ -19,7 +19,7 @@ export default function Sidebar() {
   const gotoNewApplication = () => {
     router.push('/applications/new')
   }
-  return <div className="h-full min-w-[225px] py-4 px-6 bg-white shadow">
+  return <div className="shrink-0 h-full w-[225px] py-4 px-6 bg-white shadow">
     <Image
       src={Logo}
       alt="prepper logo"
@@ -47,7 +47,11 @@ export default function Sidebar() {
     <hr className='my-1 mx-2'/>
     <ul className='gap-1 flex flex-col'>
       {
-        applications?.map(app => <SidebarButton key={app.id} href={`/applications/${app.id}`}>
+        applications?.map(app => <SidebarButton 
+          highlighted={app.id !== undefined && router.query.applicationId?.includes(app.id)}
+          key={app.id} 
+          href={`/applications/${app.id}`}
+        >
           {app.name}
         </SidebarButton>)
       }
@@ -64,8 +68,9 @@ function SidebarButton({highlighted=false, children, href, ...props}: SidebarBut
     <Link href={href || ""}>
       <Button 
         variant='tertiary' 
-        className={cn('py-1 w-full flex gap-2 text-left text-gray-400 text-sm hover:text-blue-900', {
+        className={cn('py-1 w-full flex gap-2 text-left text-gray-400 text-sm hover:text-blue-700', {
           "bg-blue-100": highlighted,
+          "text-blue-700": highlighted
         })}
         {...props}
       >
