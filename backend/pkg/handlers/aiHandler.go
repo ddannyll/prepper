@@ -127,3 +127,14 @@ type AnalysisRequest struct {
 	Question string `json:"question"`
 	Answer   string `json:"answer"`
 }
+
+func (p *AIHandler) GetAudio(c *fiber.Ctx) error {
+	QuestionRead := string(c.BodyRaw())
+	audioData, err := p.aiService.Text2Voice(c.Context(), QuestionRead)
+	if err != nil {
+		log.Println(err)
+		return fiber.NewError(fiber.StatusInternalServerError, "failed to process request")
+	}
+	// Send the response back to the client
+	return c.JSON(audioData)
+}

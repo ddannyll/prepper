@@ -19,6 +19,8 @@ require (
 	golang.org/x/text v0.13.0
 )
 
+require github.com/haguro/elevenlabs-go v0.2.2
+
 require (
 	github.com/KyleBanks/depth v1.2.1 // indirect
 	github.com/PuerkitoBio/purell v1.1.1 // indirect
