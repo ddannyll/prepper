@@ -14,14 +14,18 @@ import (
 )
 
 type AI struct {
-	Key string
+	OpenAiKey     string
+	ElevenLabsKey string
 }
 
 func NewAI(env config.EnvVars) *AI {
 
 	fmt.Println("Key: ", env.GATEWAY_KEY)
 
-	newAI := &AI{Key: env.GATEWAY_KEY}
+	newAI := &AI{
+		OpenAiKey:     env.GATEWAY_KEY,
+		ElevenLabsKey: env.ELEVEN_LABS,
+	}
 	return newAI
 }
 
@@ -42,7 +46,7 @@ func (o *AI) GetQuestion(ctx context.Context, i *SpecificQuestion) (string, erro
 		Temperature: 1,
 	}
 
-	c := openai.NewClient(o.Key)
+	c := openai.NewClient(o.OpenAiKey)
 
 	resp, err := c.CreateCompletion(ctx, completionRequest)
 	if err != nil {
@@ -91,7 +95,7 @@ func (o *AI) AnalyseResponse(ctx context.Context, r *QuestionAnswerPair) (Analys
 		Temperature: 0,
 	}
 
-	c := openai.NewClient(o.Key)
+	c := openai.NewClient(o.OpenAiKey)
 	resp, err := c.CreateCompletion(ctx, completionRequest)
 
 	analysis := Analysis{}
@@ -107,7 +111,7 @@ func (o *AI) AnalyseResponse(ctx context.Context, r *QuestionAnswerPair) (Analys
 func (o *AI) Voice2Text(ctx context.Context, audioPath string) (Voice2TextResponse, error) {
 
 	// Make the client
-	c := openai.NewClient(o.Key)
+	c := openai.NewClient(o.OpenAiKey)
 
 	// Create the request
 	req := openai.AudioRequest{
@@ -144,7 +148,7 @@ func (o *AI) GetQuestionsFromJobDescription(ctx context.Context, jobDescription 
 		Temperature: 0,
 	}
 
-	c := openai.NewClient(o.Key)
+	c := openai.NewClient(o.OpenAiKey)
 
 	resp, err := c.CreateCompletion(ctx, completionRequest)
 
@@ -168,10 +172,9 @@ func (o *AI) GetQuestionsFromJobDescription(ctx context.Context, jobDescription 
 	}, nil
 }
 
-func Text2Voice(env config.EnvVars, questionread string) ([]byte, error) {
+func (o *AI) Text2Voice(ctx context.Context, questionread string) ([]byte, error) {
 	// Create a new client
-	client := elevenlabs.NewClient(context.Background(), env.ELEVEN_LABS, 30*time.Second)
-
+	client := elevenlabs.NewClient(ctx, o.ElevenLabsKey, 30*time.Second)
 	// Create a TextToSpeechRequest
 	ttsReq := elevenlabs.TextToSpeechRequest{
 		Text:    questionread,
@@ -183,6 +186,11 @@ func Text2Voice(env config.EnvVars, questionread string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	// Write the audio file bytes to disk
+	// if err := os.WriteFile("adam.mp3", audio, 0644); err != nil {
+	// 	log.Fatal(err)
+	// }
 
 	return audio, nil
 }
