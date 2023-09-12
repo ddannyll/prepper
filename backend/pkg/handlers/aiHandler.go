@@ -138,3 +138,28 @@ func (p *AIHandler) GetAudio(c *fiber.Ctx) error {
 	// Send the response back to the client
 	return c.JSON(audioData)
 }
+
+type CoverLetter struct {
+	Name       string
+	Education  string
+	Position   string
+	Company    string
+	Reasons    string //reasons to join the company
+	Experience string //previous experience wanted in the cover letter
+}
+
+func (p *AIHandler) CoverLetter(c *fiber.Ctx) error {
+	r := &CoverLetter{}
+	err := c.BodyParser(r)
+	if err != nil {
+		fmt.Println(err)
+	}
+	coverletter, err := p.aiService.GenerateCoverLetter(c.Context(), &service.CoverLetter{})
+
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	c.SendString(coverletter)
+	return nil
+}
