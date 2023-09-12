@@ -226,25 +226,3 @@ func (o *AI) GenerateCoverLetter(ctx context.Context, j *CoverLetter) (string, e
 
 	return resp.Choices[0].Text, nil
 }
-
-// func (o *AI) GetQuestion(ctx context.Context, i *SpecificQuestion) (string, error) {
-
-// 	position := i.JobPosition
-// 	questionType := i.QuestionType
-
-// 	completionRequest := openai.CompletionRequest{
-// 		Model:       openai.GPT3TextDavinci003,
-// 		MaxTokens:   2000,
-// 		Prompt:      fmt.Sprintf("You are a senior hiring manager. Create a single %s one sentence question for a %s. Return question in JSON format only.", questionType, position),
-// 		Temperature: 1,
-// 	}
-
-// 	c := openai.NewClient(o.OpenAiKey)
-
-// 	resp, err := c.CreateCompletion(ctx, completionRequest)
-// 	if err != nil {
-// 		return "", err
-// 	}
-
-// 	return resp.Choices[0].Text, nil
-// }
