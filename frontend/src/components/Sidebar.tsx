@@ -7,6 +7,7 @@ import { HTTPApplicatonFetcher } from '@/service/aplicationFetcher'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
+import { LogOutIcon } from 'lucide-react'
 const applicationFetcher = new HTTPApplicatonFetcher()
 export default function Sidebar() {
   const router = useRouter()
@@ -19,12 +20,14 @@ export default function Sidebar() {
   const gotoNewApplication = () => {
     router.push('/applications/new')
   }
-  return <div className="shrink-0 h-full w-[225px] py-4 px-6 bg-white shadow">
-    <Image
-      src={Logo}
-      alt="prepper logo"
-      className='w-40 px-3'
-    />
+  return <div className="shrink-0 h-full w-[225px] py-4 px-6 bg-white shadow flex flex-col">
+    <Link href={"/applications"}>
+      <Image
+        src={Logo}
+        alt="prepper logo"
+        className='w-40 px-3'
+      />
+    </Link>
     { // for a future milestone
     // <ul className='flex flex-col gap-2 my-8'>
     //   <SidebarButton>
@@ -56,6 +59,13 @@ export default function Sidebar() {
         </SidebarButton>)
       }
     </ul>
+    <div className='grow text-sm text-gray-400 flex flex-col justify-end'>
+      <hr className='my-2'/>
+      <Link href="/login" className='flex gap-2 items-center rounded transition hover:bg-gray-100 hover:text-gray-600 p-2 px-4'>
+        <LogOutIcon className='w-4 h-4'/>
+        Sign out
+      </Link>
+    </div>
   </div>
 }
 

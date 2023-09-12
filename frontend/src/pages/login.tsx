@@ -7,7 +7,10 @@ import Image from 'next/image'
 import { UserContext, useUser } from '@/context/UserContext'
 import { backendAPI } from '@/service/API'
 import Button from '@/components/ui-kit/Button'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
+import BeatLoader from 'react-spinners/BeatLoader'
+import { cn } from '@/lib/utils'
+import { useToast } from '@/components/ui/use-toast'
 
 type LoginInputs = {
     username: string
@@ -15,23 +18,30 @@ type LoginInputs = {
 }
 
 const labelClasses = 'font-bold text-sm mt-2 flex text-gray-700'
-const inputClasses = 'p-2 w-full rounded bg-gray-100'
+const inputClasses = 'p-2 px-4 w-full rounded bg-gray-100'
 const RequiredStar = () => (<div className="text-red-500 inline text-xs pl-1">*</div>)
 
 export default function Login() {
   const router = useRouter()
   const {login} = useUser()
+  const [loading, setLoading] = useState(false)
+  const {toast} = useToast()
   const { register, handleSubmit, formState: {errors} } = useForm<LoginInputs>()
 
   const onSubmit: SubmitHandler<LoginInputs> = async data => {
-    console.log(data)
-    const res = await backendAPI.user.signinCreate(data)
-    if (res.ok) {
-      console.log(res)
-      login({id: res.data.id as string, username: data.username})
-      localStorage.setItem('token', res.data.access_token as string)
-      router.push('applications')
+    setLoading(true)
+    try {
+      const res = await backendAPI.user.signinCreate(data)
+      if (res.ok) {
+        login({id: res.data.id as string, username: data.username})
+        localStorage.setItem('token', res.data.access_token as string)
+        router.push('applications')
+      }
     }
+    catch {
+      console.error("failed to login")
+    }
+    setLoading(false)
   }
 
   return (
@@ -72,7 +82,10 @@ export default function Login() {
           </label>
           <input id="password" type="password" className={inputClasses} {...register('password', {required: true})}/>
 
-          <Button className='mt-4'>Log in</Button>
+          <Button className={cn('mt-4 relative transition', {"text-opacity-0": loading})}> 
+            <BeatLoader color='white' className={cn('transition absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-[40%]', {"opacity-0": !loading})}/> 
+            Login
+          </Button>
           <p className="text-sm">
                     Need an account?
             <Link href={'/register'} className="text-blue-400 hover:underline px-1">
