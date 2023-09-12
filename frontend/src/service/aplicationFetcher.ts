@@ -24,7 +24,7 @@ export class HTTPApplicatonFetcher {
         },
       }
     )
-    return newApp
+    return newApp.data
   }
   async fetchApplicationQuestions(id: string) {
     const questions = await backendAPI.application.applicationIdQuestionsList(
