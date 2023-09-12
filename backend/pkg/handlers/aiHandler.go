@@ -128,6 +128,15 @@ type AnalysisRequest struct {
 	Answer   string `json:"answer"`
 }
 
+// Text2voice godoc
+//
+// @Summary converts text to voice
+// @Tags ai
+// @Accept json
+// @Produce byte[]
+// @Router /ai/text2voice [post]
+// @Description Produces an audio file reading out the given text
+
 func (p *AIHandler) GetAudio(c *fiber.Ctx) error {
 	QuestionRead := string(c.BodyRaw())
 	audioData, err := p.aiService.Text2Voice(c.Context(), QuestionRead)
@@ -139,6 +148,14 @@ func (p *AIHandler) GetAudio(c *fiber.Ctx) error {
 	return c.JSON(audioData)
 }
 
+// Cover Letter godoc
+//
+// @Summary creates personalised cover letter
+// @Tags ai
+// @Accept json
+// @Produce json
+// @Router /ai/coverletter [post]
+// @Description Inputs include given name, education, position and company you are applying for, reasons to apply and previous experience
 type CoverLetter struct {
 	Name       string
 	Education  string
@@ -154,7 +171,14 @@ func (p *AIHandler) CoverLetter(c *fiber.Ctx) error {
 	if err != nil {
 		fmt.Println(err)
 	}
-	coverletter, err := p.aiService.GenerateCoverLetter(c.Context(), &service.CoverLetter{})
+	coverletter, err := p.aiService.GenerateCoverLetter(c.Context(), &service.CoverLetter{
+		Name:       r.Name,
+		Education:  r.Education,
+		Position:   r.Position,
+		Company:    r.Company,
+		Reasons:    r.Reasons,
+		Experience: r.Experience,
+	})
 
 	if err != nil {
 		fmt.Println(err)
