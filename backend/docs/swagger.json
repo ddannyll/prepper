@@ -63,6 +63,77 @@
                 }
             }
         },
+        "/application/:applicationId/questions": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "application"
+                ],
+                "summary": "Get an user's application question types",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "applicationId",
+                        "name": "applicationId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ApplicationQuestionResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "test"
+                    }
+                }
+            }
+        },
+        "/application/:applicationId/questions/generate": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "application"
+                ],
+                "summary": "Use AI to generate questions based on questions tags in a specified application",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "applicationId",
+                        "name": "applicationId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/handlers.GeneratedQuestion"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "test"
+                    }
+                }
+            }
+        },
         "/application/create": {
             "post": {
                 "description": "an application has some properties",
@@ -108,44 +179,16 @@
                 "summary": "Get user's applications",
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/db.InnerApplication"
+                            }
+                        }
                     },
                     "401": {
                         "description": "Unauthorized"
-                    }
-                }
-            }
-        },
-        "/application/questions": {
-            "post": {
-                "description": "an application has some properties",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "application"
-                ],
-                "summary": "Get questoins for the user",
-                "parameters": [
-                    {
-                        "description": "Application",
-                        "name": "applicationQuestionsBody",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/applicationQuestionsBody"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/applicationQuestionsSuccessResponse"
-                        }
                     }
                 }
             }
@@ -291,15 +334,6 @@
                 "name"
             ],
             "properties": {
-                "description": {
-                    "type": "string",
-                    "example": "SafetyCulture is an Australian-based global technology company that specialises in building inspection apps for the web and mobile devices."
-                },
-                "icon": {
-                    "description": "icon link?",
-                    "type": "string",
-                    "example": "https://www.safetyculture.com/wp-content/uploads/2020/10/safetyculture-logo.svg"
-                },
                 "jobDescription": {
                     "type": "string",
                     "example": "Looking for an engineer to join our team."
@@ -307,6 +341,15 @@
                 "name": {
                     "type": "string",
                     "example": "SafetyCulture"
+                },
+                "questions": {
+                    "type": "array",
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
                 }
             }
         },
@@ -320,14 +363,6 @@
                 "createdAt": {
                     "type": "string",
                     "example": "2021-07-01T00:00:00.000Z"
-                },
-                "description": {
-                    "type": "string",
-                    "example": "SafetyCulture is an Australian-based global technology company that specialises in building inspection apps for the web and mobile devices."
-                },
-                "icon": {
-                    "type": "string",
-                    "example": "https://www.safetyculture.com/wp-content/uploads/2020/10/safetyculture-logo.svg"
                 },
                 "id": {
                     "type": "string",
@@ -373,21 +408,31 @@
                 }
             }
         },
-        "applicationQuestionsBody": {
+        "db.InnerApplication": {
             "type": "object",
             "properties": {
-                "id": {
-                    "type": "string",
-                    "example": "1337"
+                "createdAt": {
+                    "type": "string"
                 },
-                "numberQuestions": {
-                    "type": "integer",
-                    "example": 5
+                "id": {
+                    "type": "string"
+                },
+                "jobDescription": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "ownerId": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                },
+                "url": {
+                    "type": "string"
                 }
             }
-        },
-        "applicationQuestionsSuccessResponse": {
-            "type": "object"
         },
         "handlers.AnalysisRequest": {
             "type": "object",
@@ -397,6 +442,45 @@
                 },
                 "question": {
                     "type": "string"
+                }
+            }
+        },
+        "handlers.ApplicationQuestionResponse": {
+            "type": "object",
+            "properties": {
+                "questions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/handlers.QuestionType"
+                    }
+                }
+            }
+        },
+        "handlers.GeneratedQuestion": {
+            "type": "object",
+            "properties": {
+                "questionPrompt": {
+                    "type": "string"
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "handlers.QuestionType": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 }
             }
         },
@@ -432,5 +516,10 @@
             "name": "Authorization",
             "in": "header"
         }
-    }
+    },
+    "security": [
+        {
+            "ApiKeyAuth": []
+        }
+    ]
 }

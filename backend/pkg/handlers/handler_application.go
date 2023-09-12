@@ -29,22 +29,18 @@ func NewApplicationHandler(
 	}
 }
 
-type applicationCreateBody struct {
+type ApplicationCreateBody struct {
 	Name           string `json:"name" validate:"required" example:"SafetyCulture"`
-	Description    string `json:"description" example:"SafetyCulture is an Australian-based global technology company that specialises in building inspection apps for the web and mobile devices."`
 	JobDescription string `json:"jobDescription" validate:"required" example:"Looking for an engineer to join our team."`
-	// icon link?
-	Icon string `json:"icon" example:"https://www.safetyculture.com/wp-content/uploads/2020/10/safetyculture-logo.svg"`
+	Questions  [][]string `json:"questions"`
 } //@name ApplicationCreateBody
 
-type applicationCreateSuccessResponse struct {
+type ApplicationCreateSuccessResponse struct {
 	Id string `json:"id" example:"1337"`
 
 	Name           string `json:"name" validate:"required" example:"SafetyCulture"`
-	Description    string `json:"description" example:"SafetyCulture is an Australian-based global technology company that specialises in building inspection apps for the web and mobile devices."`
 	JobDescription string `json:"jobDescription" validate:"required" example:"Looking for an engineer to join our team."`
 	CreatedAt      string `json:"createdAt" example:"2021-07-01T00:00:00.000Z"`
-	Icon           string `json:"icon" example:"https://www.safetyculture.com/wp-content/uploads/2020/10/safetyculture-logo.svg"`
 } //@name ApplicationCreateResponse
 
 // CreateApplication godoc
@@ -53,41 +49,50 @@ type applicationCreateSuccessResponse struct {
 //	@description	an application has some properties
 //	@Tags			application
 //	@Accept			json
-//	@Param			ApplicationCreateBody	body applicationCreateBody true "Application"
+//	@Param			ApplicationCreateBody	body ApplicationCreateBody true "Application"
 //	@Produce		json
-//	@Success		200	{object} applicationCreateSuccessResponse
+//	@Success		200	{object} ApplicationCreateSuccessResponse
 //	@Router			/application/create [post]
 func (u *ApplicationHandler) ApplicationCreate(c *fiber.Ctx) error {
 
 	userID := c.Locals("userID").(string)
 
-	var application applicationCreateBody
+	var application ApplicationCreateBody
 	if err := parseAndValidateBody(c, &application); err != nil {
 		return err
 	}
 
+
 	createdApplication, createError := u.dbClient.Application.CreateOne(
 		db.Application.Name.Set(application.Name),
-		db.Application.Description.Set(application.Description),
 		db.Application.JobDescription.Set(application.JobDescription),
-		db.Application.Icon.Set(application.Icon),
-
 		db.Application.Owner.Link(
 			db.User.ID.Equals(userID),
 		),
 	).Exec(c.Context())
-
 	if createError != nil {
-		return createError
+		return createError 
+	}
+	
+	for i, q := range application.Questions {
+		// i cant find a "createMany" for goPrisma => could do this with go routines?
+		_, err := u.dbClient.QuestionType.CreateOne(
+			db.QuestionType.Number.Set(i + 1),
+			db.QuestionType.Application.Link(
+				db.Application.ID.Equals(createdApplication.ID),
+			),
+			db.QuestionType.Tags.Set(q),
+		).Exec(c.Context())
+		if err != nil {
+			log.Println("failed to create question")
+		}	
 	}
 
-	resp := applicationCreateSuccessResponse{
+	resp := ApplicationCreateSuccessResponse{
 		Id:             createdApplication.ID,
 		Name:           createdApplication.Name,
-		Description:    createdApplication.Description,
 		JobDescription: createdApplication.JobDescription,
 		CreatedAt:      createdApplication.CreatedAt.String(),
-		Icon:           "",
 	}
 
 	return c.JSON(resp)
@@ -99,7 +104,7 @@ func (u *ApplicationHandler) ApplicationCreate(c *fiber.Ctx) error {
 //	@description
 //	@Tags		application
 //	@Produce	json
-//	@Success	200
+//	@Success	200 {object} []db.InnerApplication
 //	@Failure	401
 //	@Router		/application/me [get]
 func (u *ApplicationHandler) ApplicationMe(c *fiber.Ctx) error {
@@ -134,75 +139,111 @@ func (u *ApplicationHandler) ApplicationMe(c *fiber.Ctx) error {
 	return c.JSON(resp)
 }
 
-type applicationQuestionsBody struct {
-	Id              string `json:"id" example:"1337"`
-	NumberQuestions int    `json:"numberQuestions" example:"5"`
-} //@name applicationQuestionsBody
-
-type question struct {
-	QuestionPrompt string   `json:"questionPrompt" example:"What is your name?"`
-	tags           []string `json:"tags" example:"[tag1, tag2, tag3]"`
-} //@name question
-
+type QuestionType struct {
+	Id string `json:"id"`
+	Tags []string `json:"tags"`
+}
+type ApplicationQuestionResponse struct {	
+	Questions []QuestionType `json:"questions"`
+}
 // ApplicationQuestions godoc
 //
-// @Summary		Get questoins for the user
-// @description	an application has some properties
-// @Tags			application
-// @Accept			json
-// @Param			applicationQuestionsBody	body applicationQuestionsBody true "Application"
-// @Produce		json
-// @Success		200	{object} GetQuestionsFromJobDescriptionResponse
-// @Router			/application/questions [post]
+//	@Summary	Get an user's application question types
+//	@description
+//	@Tags		application
+//  @Param applicationId  path  string true "applicationId"
+//	@Produce	json 
+//	@Success	200 {object} ApplicationQuestionResponse
+//	@Failure	401
+//  @Failure  403 "test"
+//	@Router		/application/:applicationId/questions [get]
 func (u *ApplicationHandler) ApplicationQuestions(c *fiber.Ctx) error {
-	userID := c.Locals("userID").(string)
-
-	if userID == "" {
-		log.Println("userID is empty")
+	userId := c.Locals("userID").(string)
+	if userId == "" {
 		return fiber.ErrUnauthorized
 	}
 
-	// applications, fetchError := u.dbClient.Application.FindMany(
-	// 	db.Application.Owner.Where(
-	// 		db.User.ID.Equals(userID),
-	// 	),
-	// ).Exec(c.Context())
+	appId := c.Params("applicationId")
 
-	var questionBody applicationQuestionsBody
-	if err := parseAndValidateBody(c, &questionBody); err != nil {
+	app, err := u.dbClient.Application.FindUnique(
+		db.Application.ID.Equals(appId),
+	).Exec(c.Context())
+	if err != nil || app.OwnerID != userId {
+		return fiber.NewError(fiber.StatusForbidden)
+	}
+
+	questions, err := u.dbClient.QuestionType.FindMany(
+		db.QuestionType.ApplicationID.Equals(app.ID),
+	).OrderBy(db.QuestionType.Number.Order(db.ASC)).Exec(c.Context())
+	if err != nil {
+	return err
+	}
+
+	response := ApplicationQuestionResponse{Questions: []QuestionType{}}
+	for _, q := range questions {
+		response.Questions = append(response.Questions, QuestionType{
+			Id: q.ID,
+			Tags: q.Tags,
+		})
+	}
+	return c.JSON(response)
+}
+
+type GeneratedQuestion struct {
+	Tags []string `json:"tags"`
+	QuestionPrompt string `json:"questionPrompt"`
+}
+// GetAIQuestions godoc
+//
+//	@Summary	Use AI to generate questions based on questions tags in a specified application
+//	@description
+//	@Tags		application
+//  @Param applicationId  path  string true "applicationId"
+//	@Produce	json 
+//	@Success	200 {object} []GeneratedQuestion  
+//	@Failure	401
+//  @Failure  403 "test"
+//	@Router		/application/:applicationId/questions/generate [get]
+func (u *ApplicationHandler) GetAIQuestions(c *fiber.Ctx) error {
+	userId := c.Locals("userID").(string)
+	if userId == "" {
+		return fiber.ErrUnauthorized
+	}
+	appId := c.Params("applicationId")
+	app, err := u.dbClient.Application.FindUnique(
+		db.Application.ID.Equals(appId),
+	).Exec(c.Context())
+	if err != nil || app.OwnerID != userId {
+		return fiber.NewError(fiber.StatusForbidden)
+	}
+
+	questionsTags, err := u.dbClient.QuestionType.FindMany(
+		db.QuestionType.ApplicationID.Equals(app.ID),
+	).OrderBy(db.QuestionType.Number.Order(db.ASC)).Exec(c.Context())
+	if err != nil {
+	  return err
+	}
+
+	questions := [][]string{}
+	for _, questionTags := range questionsTags {
+		questions = append(questions, questionTags.Tags)
+	}
+
+	curatedQuestions, err := u.aiService.GetCuratedQuestions(c.Context(), app.Name, app.JobDescription, questions)
+	if err != nil {
 		return err
 	}
 
-	// find the application
-	application, fetchError := u.dbClient.Application.FindUnique(
-		db.Application.ID.Equals(questionBody.Id),
-	).Exec(c.Context())
-
-	log.Println("WHAT IS THE USER ID", userID)
-	log.Println("QID", questionBody.Id)
-
-	if fetchError != nil {
-		return fetchError
+	if len(curatedQuestions) != len(questions) {
+		return fiber.ErrInternalServerError
+	}
+	curatedQuestionsTagged := []GeneratedQuestion{}
+	for i, curatedQuestion := range curatedQuestions {
+		curatedQuestionsTagged = append(curatedQuestionsTagged, GeneratedQuestion{
+			QuestionPrompt: curatedQuestion,
+			Tags: questions[i],
+		})
 	}
 
-	// get the job description
-	jobDescription := application.JobDescription
-	numberQuestions := questionBody.NumberQuestions
-
-	// if it's more than 5 questions, return an error
-	if numberQuestions > 5 {
-		return fiber.NewError(fiber.StatusBadRequest, "Number of questions must be less than 5")
-	}
-
-	// get the questions
-
-	resp, er := u.aiService.GetQuestionsFromJobDescription(c.Context(), jobDescription, numberQuestions, application.Name)
-
-	if er != nil {
-		return er
-	}
-	// use the job description to get the questions
-
-	log.Println("RESPONSE", resp)
-	return c.JSON(resp)
+	return c.JSON(curatedQuestionsTagged)
 }

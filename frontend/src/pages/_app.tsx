@@ -3,6 +3,7 @@ import Head from "next/head";
 import "../styles/globals.css";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { UserProvider } from "@/context/UserContext";
+import Layout from "@/components/Layout";
 
 const queryClient = new QueryClient();
 export default function App(props: AppProps) {
@@ -19,7 +20,9 @@ export default function App(props: AppProps) {
       </Head>
       <UserProvider>
         <QueryClientProvider client={queryClient}>
-          <Component {...pageProps} />
+          <Layout>
+            <Component {...pageProps} />
+          </Layout>
         </QueryClientProvider>
       </UserProvider>
     </>
