@@ -142,11 +142,11 @@ func (o *AI) GetCuratedQuestions(ctx context.Context, companyName string, jobDes
 		questionsTagsPrompt = fmt.Sprintf("%s\n- 1 '%v' question", questionsTagsPrompt, questionTags)
 	}
 	fmt.Printf("---\n%v\n", questionsTagsPrompt)
-	
+
 	completionRequest := openai.CompletionRequest{
-		Model:     openai.GPT3TextDavinci003,
-		MaxTokens: 2000,
-		Prompt: fmt.Sprintf("You are a senior hiring manager at %s. Given the following job description: \n\n---%s---\n\n Curate single sentence interview questions according to below:\n%s\n\n format the questions into a JSON array of strings, removing the question type. Only return JSON, do not put any random text around the JSON.", companyName, jobDescription,questionsTagsPrompt), 		
+		Model:       openai.GPT3TextDavinci003,
+		MaxTokens:   2000,
+		Prompt:      fmt.Sprintf("You are a senior hiring manager at %s. Given the following job description: \n\n---%s---\n\n Curate single sentence interview questions according to below:\n%s\n\n format the questions into a JSON array of strings, removing the question type. Only return JSON, do not put any random text around the JSON.", companyName, jobDescription, questionsTagsPrompt),
 		Temperature: 0,
 	}
 
@@ -169,10 +169,9 @@ func (o *AI) GetCuratedQuestions(ctx context.Context, companyName string, jobDes
 
 	log.Println(resp.Choices[0].Text)
 
-	
 	res := []string{}
-	
-	if jsonErr :=	json.Unmarshal([]byte(tt), &res); jsonErr != nil {
+
+	if jsonErr := json.Unmarshal([]byte(tt), &res); jsonErr != nil {
 		return res, jsonErr
 	}
 	return res, nil
@@ -199,4 +198,34 @@ func (o *AI) Text2Voice(ctx context.Context, questionread string) ([]byte, error
 	// }
 
 	return audio, nil
+}
+
+type CoverLetter struct {
+	Name       string
+	Education  string
+	Position   string
+	Company    string
+	Reasons    string //reasons to join the company
+	Experience string //previous experience wanted in the cover letter
+}
+
+func (o *AI) GenerateCoverLetter(ctx context.Context, j *CoverLetter) (string, error) {
+	fmt.Printf("hi")
+	fmt.Printf(j.Company, j.Education, j.Experience, j.Name, j.Position, j.Reasons)
+	fmt.Printf("Create a cover letter for %s from %s for a %s role at %s. Include the following reasons and previous experience: %s, %s", j.Name, j.Education, j.Position, j.Company, j.Reasons, j.Experience)
+	completionRequest := openai.CompletionRequest{
+		Model:       openai.GPT3TextDavinci003,
+		MaxTokens:   2000,
+		Prompt:      fmt.Sprintf("Create a cover letter for %s from %s for a %s role at %s. Include the following reasons and previous experience: %s, %s. Return answer in JSON format and JSON format only", j.Name, j.Education, j.Position, j.Company, j.Reasons, j.Experience),
+		Temperature: 1,
+	}
+
+	c := openai.NewClient(o.OpenAiKey)
+
+	resp, err := c.CreateCompletion(ctx, completionRequest)
+	if err != nil {
+		return "", err
+	}
+
+	return resp.Choices[0].Text, nil
 }
