@@ -107,7 +107,7 @@ export default function Register() {
           <p className="text-sm">
             Have an account?
             <Link href={'/login'} className="text-blue-400 hover:underline px-1">
-              Register
+              Login
             </Link>
           </p>
         </form>
