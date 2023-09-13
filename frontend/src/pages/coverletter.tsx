@@ -51,29 +51,29 @@ export default function CoverLetter() {
         onSubmit={handleSubmit(onSubmit)}>
         <FormLabel>
         Your Name
-          <Input {...register("name")}/>
+          <Input {...register("name")} defaultValue={"Charlie"}/>
         </FormLabel>
         <div className="flex gap-4 ">
           <FormLabel>
           Company Name 
-            <Input {...register("company")}/>
+            <Input {...register("company")} defaultValue={"Willy Wonka's chocolate factory"}/>
           </FormLabel>
           <FormLabel>
           Job Position
-            <Input {...register("position")}/>
+            <Input {...register("position")} defaultValue={"Factory manager"}/>
           </FormLabel>
         </div>
         <FormLabel>
         Experience
-          <Textarea {...register("experience")}/>
+          <Textarea {...register("experience")} defaultValue={"SafetyCulture AI Accelerator"}/>
         </FormLabel>
         <FormLabel>
         Education 
-          <Textarea {...register("education")} />
+          <Textarea {...register("education")} defaultValue={"Graduated from UNSW with a Bachelor's of Computer Science"}/>
         </FormLabel>
         <FormLabel>
         Reasons for Applying
-          <Textarea {...register("reasons")} />
+          <Textarea {...register("reasons")} defaultValue={"I am passionate about software engineering and I love chocolate!"}/>
         </FormLabel>
         <Button className="justify-center" type="submit">Generate</Button>
       </form>

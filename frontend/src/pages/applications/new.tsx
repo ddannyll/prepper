@@ -64,6 +64,7 @@ export default function NewApplication() {
       <div className="flex flex-col gap-3">
         <Label>Job Description</Label>
         <Textarea 
+          defaultValue={"Charlie and the chocolate factory."}
           className="h-full box-border resize-none outline-white focus-visible:ring-0"
           placeholder="Copy and paste a job description here" id="job-description" 
           {...register("jobDescription")}
