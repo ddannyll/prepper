@@ -19,9 +19,6 @@ type AI struct {
 }
 
 func NewAI(env config.EnvVars) *AI {
-
-	fmt.Println("Key: ", env.GATEWAY_KEY)
-
 	newAI := &AI{
 		OpenAiKey:     env.GATEWAY_KEY,
 		ElevenLabsKey: env.ELEVEN_LABS,
@@ -138,10 +135,8 @@ func (o *AI) GetCuratedQuestions(ctx context.Context, companyName string, jobDes
 
 	questionsTagsPrompt := ""
 	for _, questionTags := range questionsTags {
-		fmt.Println(questionTags)
 		questionsTagsPrompt = fmt.Sprintf("%s\n- 1 '%v' question", questionsTagsPrompt, questionTags)
 	}
-	fmt.Printf("---\n%v\n", questionsTagsPrompt)
 
 	completionRequest := openai.CompletionRequest{
 		Model:       openai.GPT3TextDavinci003,
@@ -210,9 +205,6 @@ type CoverLetter struct {
 }
 
 func (o *AI) GenerateCoverLetter(ctx context.Context, j *CoverLetter) (string, error) {
-	fmt.Printf("hi")
-	fmt.Printf(j.Company, j.Education, j.Experience, j.Name, j.Position, j.Reasons)
-	fmt.Printf("Create a cover letter for %s from %s for a %s role at %s. Include the following reasons and previous experience: %s, %s", j.Name, j.Education, j.Position, j.Company, j.Reasons, j.Experience)
 	completionRequest := openai.CompletionRequest{
 		Model:       openai.GPT3TextDavinci003,
 		MaxTokens:   2000,
