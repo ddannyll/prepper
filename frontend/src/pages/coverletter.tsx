@@ -37,7 +37,7 @@ export default function CoverLetter() {
     setCoverletter(cl.data.coverLetter || "")
   }
 
-  return <div className="w-full h-full p-10 flex flex-col items-center relative">
+  return <div className="w-full h-full p-10 flex flex-col items-center relative overflow-y-scroll">
     <Dialog>
       <DialogTrigger className="text-xs text-gray-500 absolute p-2 top-0 right-0">
           Curation coming soon*
@@ -51,7 +51,7 @@ export default function CoverLetter() {
     </Dialog>
     <h1 className="text-3xl text-gray-800 px-4 py-2 mb-4 border-b-2 border-b-blue-500">Generate a Cover Letter!</h1>
 
-    <div className="grid gap-10 grid-cols-2 overflow-hidden">
+    <div className="grid gap-10 grid-cols-1 md:grid-cols-2 md:overflow-hidden">
       
       <form 
         className="flex gap-4 flex-col text-gray-800"

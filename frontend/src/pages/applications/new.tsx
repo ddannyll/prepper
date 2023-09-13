@@ -66,7 +66,7 @@ export default function NewApplication() {
         placeholder={"Company Name"}
         {...register("jobName")}
       />
-      <div className="w-full h-full grid grid-cols-2 gap-5 overflow-hidden">
+      <div className="w-full h-full grid grid-cols-1 grid-rows-2 md:grid-rows-1 md:grid-cols-2 gap-5 overflow-hidden">
         <div className="flex flex-col gap-3">
           <Label>Job Description</Label>
           <Textarea
