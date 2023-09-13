@@ -39,7 +39,6 @@ definitions:
     properties:
       password:
         example: daniel321
-        minLength: 6
         type: string
       username:
         example: daniel
@@ -109,6 +108,10 @@ definitions:
     type: object
   handlers.GeneratedQuestion:
     properties:
+      audioLink:
+        items:
+          type: integer
+        type: array
       questionPrompt:
         type: string
       tags:
@@ -384,8 +387,6 @@ paths:
       summary: Sign a user up to dancord
       tags:
       - user
-security:
-- ApiKeyAuth: []
 securityDefinitions:
   ApiKeyAuth:
     in: header

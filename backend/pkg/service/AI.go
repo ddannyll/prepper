@@ -182,7 +182,7 @@ func (o *AI) Text2Voice(ctx context.Context, questionread string) ([]byte, error
 	}
 
 	// Call the TextToSpeech method on the client, using the "Adam"'s voice ID.
-	audio, err := client.TextToSpeech("pNInz6obpgDQGcFmaJgB", ttsReq)
+	audio, err := client.TextToSpeech("JpSZVyDoK7Yi7NHGnId0", ttsReq)
 	if err != nil {
 		return nil, err
 	}
