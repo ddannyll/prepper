@@ -40,6 +40,53 @@
                 }
             }
         },
+        "/ai/coverletter": {
+            "post": {
+                "description": "Inputs include given name, education, position and company you are applying for, reasons to apply and previous experience",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ai"
+                ],
+                "summary": "creates personalised cover letter",
+                "parameters": [
+                    {
+                        "description": "cover letter request",
+                        "name": "CoverLetterDetails",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.CoverLetterRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.CoverLetterResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/ai/text2voice": {
+            "post": {
+                "description": "Produces an audio file reading out the given text",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ai"
+                ],
+                "summary": "converts text to voice",
+                "responses": {}
+            }
+        },
         "/ai/voice2text": {
             "post": {
                 "description": "The API endpoint expects an audio file in audio/webm format to be provided in the request body as a blob.",
@@ -453,6 +500,37 @@
                     "items": {
                         "$ref": "#/definitions/handlers.QuestionType"
                     }
+                }
+            }
+        },
+        "handlers.CoverLetterRequest": {
+            "type": "object",
+            "properties": {
+                "company": {
+                    "type": "string"
+                },
+                "education": {
+                    "type": "string"
+                },
+                "experience": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "position": {
+                    "type": "string"
+                },
+                "reasons": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers.CoverLetterResponse": {
+            "type": "object",
+            "properties": {
+                "coverLetter": {
+                    "type": "string"
                 }
             }
         },

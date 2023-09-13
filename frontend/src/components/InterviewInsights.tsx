@@ -79,7 +79,7 @@ export default function InterviewInsights({
   return (
     <div className="flex flex-col items-center overflow-hidden justify-between p-8 h-full">
       <div className="flex gap-8 w-full pb-4 overflow-hidden items-start justify-center">
-        <div className="max-w-lg w-full h-full grow overflow-hidden p-6 shadow-md bg-white rounded-lg flex flex-col gap-3">
+        <div className="max-w-lg w-full h-fit grow overflow-hidden p-6 shadow-md bg-white rounded-lg flex flex-col gap-3">
           <div className="flex gap-2 items-end">
             <QuestionNumber
               questionNum={questionIndex + 1}

@@ -87,6 +87,26 @@ definitions:
           $ref: '#/definitions/handlers.QuestionType'
         type: array
     type: object
+  handlers.CoverLetterRequest:
+    properties:
+      company:
+        type: string
+      education:
+        type: string
+      experience:
+        type: string
+      name:
+        type: string
+      position:
+        type: string
+      reasons:
+        type: string
+    type: object
+  handlers.CoverLetterResponse:
+    properties:
+      coverLetter:
+        type: string
+    type: object
   handlers.GeneratedQuestion:
     properties:
       questionPrompt:
@@ -146,6 +166,38 @@ paths:
           schema:
             $ref: '#/definitions/service.Analysis'
       summary: analyse an answer to a question
+      tags:
+      - ai
+  /ai/coverletter:
+    post:
+      consumes:
+      - application/json
+      description: Inputs include given name, education, position and company you
+        are applying for, reasons to apply and previous experience
+      parameters:
+      - description: cover letter request
+        in: body
+        name: CoverLetterDetails
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CoverLetterRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handlers.CoverLetterResponse'
+      summary: creates personalised cover letter
+      tags:
+      - ai
+  /ai/text2voice:
+    post:
+      consumes:
+      - application/json
+      description: Produces an audio file reading out the given text
+      responses: {}
+      summary: converts text to voice
       tags:
       - ai
   /ai/voice2text:
