@@ -51,7 +51,7 @@ export default function CoverLetter() {
     </Dialog>
     <h1 className="text-3xl text-gray-800 px-4 py-2 mb-4 border-b-2 border-b-blue-500">Generate a Cover Letter!</h1>
 
-    <div className="grid gap-10 grid-cols-2">
+    <div className="grid gap-10 grid-cols-2 overflow-hidden">
       
       <form 
         className="flex gap-4 flex-col text-gray-800"
@@ -85,11 +85,11 @@ export default function CoverLetter() {
         <Button className="justify-center" type="submit">Generate</Button>
       </form>
       
-      <div className="h-full max-w-[500px] overflow-y-hidden flex flex-col gap-1">
+      <div className="h-full max-w-[500px] overflow-hidden flex flex-col gap-1">
         <Label>Generated Cover Letter</Label>
-        <div className="text-gray-700 w-full h-full border bg-white rounded p-3 overflow-y-auto">
+        <pre className="whitespace-pre-line text-gray-700 w-full h-full border bg-white rounded p-3 overflow-y-scroll">
           {coverletter}
-        </div>
+        </pre>
       </div>
     
     </div>
