@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils"
+import { Label } from "../ui/label"
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   variant?: "outline" | "darkened"
@@ -14,9 +15,9 @@ export default function Input({variant="outline", id, error=[], label, className
   } 
   return <div className="flex flex-col text-gray-800">
     {label && 
-    <label htmlFor={id} >
+    <Label htmlFor={id} >
       {label}
-    </label>
+    </Label>
     }
     <input id={id} className={cn(`rounded-md px-4 py-2 focus:outline-gray-500`, variantClasses[variant], className)} {...props}/>
   </div>}

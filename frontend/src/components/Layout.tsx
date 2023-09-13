@@ -18,7 +18,7 @@ export default function Layout({children}: LayoutProps) {
       {children}
     </div>
   }
-  if (!router.pathname.includes('application')) {
+  if (!router.pathname.match(/applications|coverletter/g)) {
     return <div className="w-screen h-screen">
       <Toaster />
       {children}

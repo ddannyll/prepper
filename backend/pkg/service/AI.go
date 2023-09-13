@@ -216,7 +216,7 @@ func (o *AI) GenerateCoverLetter(ctx context.Context, j *CoverLetter) (string, e
 	completionRequest := openai.CompletionRequest{
 		Model:       openai.GPT3TextDavinci003,
 		MaxTokens:   2000,
-		Prompt:      fmt.Sprintf("Create a cover letter for %s from %s for a %s role at %s. Include the following reasons and previous experience: %s, %s. Return answer in JSON format and JSON format only", j.Name, j.Education, j.Position, j.Company, j.Reasons, j.Experience),
+		Prompt:      fmt.Sprintf("Create a cover letter for %s from %s for a %s role at %s. Include the following reasons and previous experience: %s, %s. Only return the cover letter, do not put any text around.", j.Name, j.Education, j.Position, j.Company, j.Reasons, j.Experience),
 		Temperature: 1,
 	}
 

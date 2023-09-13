@@ -63,6 +63,19 @@ export interface HandlersApplicationQuestionResponse {
   questions?: HandlersQuestionType[];
 }
 
+export interface HandlersCoverLetterRequest {
+  company?: string;
+  education?: string;
+  experience?: string;
+  name?: string;
+  position?: string;
+  reasons?: string;
+}
+
+export interface HandlersCoverLetterResponse {
+  coverLetter?: string;
+}
+
 export interface HandlersGeneratedQuestion {
   questionPrompt?: string;
   tags?: string[];
@@ -318,6 +331,44 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         secure: true,
         type: ContentType.Json,
         format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Inputs include given name, education, position and company you are applying for, reasons to apply and previous experience
+     *
+     * @tags ai
+     * @name CoverletterCreate
+     * @summary creates personalised cover letter
+     * @request POST:/ai/coverletter
+     * @secure
+     */
+    coverletterCreate: (CoverLetterDetails: HandlersCoverLetterRequest, params: RequestParams = {}) =>
+      this.request<HandlersCoverLetterResponse, any>({
+        path: `/ai/coverletter`,
+        method: "POST",
+        body: CoverLetterDetails,
+        secure: true,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * @description Produces an audio file reading out the given text
+     *
+     * @tags ai
+     * @name Text2VoiceCreate
+     * @summary converts text to voice
+     * @request POST:/ai/text2voice
+     * @secure
+     */
+    text2VoiceCreate: (params: RequestParams = {}) =>
+      this.request<any, any>({
+        path: `/ai/text2voice`,
+        method: "POST",
+        secure: true,
+        type: ContentType.Json,
         ...params,
       }),
 

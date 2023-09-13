@@ -82,7 +82,7 @@ export default function Login() {
           </label>
           <input id="password" type="password" className={inputClasses} {...register('password', {required: true})}/>
 
-          <Button className={cn('mt-4 relative transition', {"text-opacity-0": loading})}> 
+          <Button className={cn('mt-4 relative transition justify-center', {"text-opacity-0": loading})}> 
             <BeatLoader color='white' className={cn('transition absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-[40%]', {"opacity-0": !loading})}/> 
             Login
           </Button>

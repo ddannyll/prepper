@@ -131,12 +131,10 @@ type AnalysisRequest struct {
 // Text2voice godoc
 //
 // @Summary converts text to voice
+// @Description Produces an audio file reading out the given text
 // @Tags ai
 // @Accept json
-// @Produce byte[]
 // @Router /ai/text2voice [post]
-// @Description Produces an audio file reading out the given text
-
 func (p *AIHandler) GetAudio(c *fiber.Ctx) error {
 	QuestionRead := string(c.BodyRaw())
 	audioData, err := p.aiService.Text2Voice(c.Context(), QuestionRead)
@@ -148,25 +146,30 @@ func (p *AIHandler) GetAudio(c *fiber.Ctx) error {
 	return c.JSON(audioData)
 }
 
+type CoverLetterRequest struct {
+	Name       string `json:"name"`
+	Education  string `json:"education"`
+	Position   string `json:"position"`
+	Company    string `json:"company"`
+	Reasons    string `json:"reasons"`
+	Experience string `json:"experience"`
+}
+type CoverLetterResponse struct {
+	CoverLetter string `json:"coverLetter"`
+}
+
 // Cover Letter godoc
 //
 // @Summary creates personalised cover letter
+// @Description Inputs include given name, education, position and company you are applying for, reasons to apply and previous experience
 // @Tags ai
 // @Accept json
+// @Param CoverLetterDetails body CoverLetterRequest true "cover letter request"
 // @Produce json
+// @Success 200 {object} CoverLetterResponse 
 // @Router /ai/coverletter [post]
-// @Description Inputs include given name, education, position and company you are applying for, reasons to apply and previous experience
-type CoverLetter struct {
-	Name       string
-	Education  string
-	Position   string
-	Company    string
-	Reasons    string //reasons to join the company
-	Experience string //previous experience wanted in the cover letter
-}
-
 func (p *AIHandler) CoverLetter(c *fiber.Ctx) error {
-	r := &CoverLetter{}
+	r := &CoverLetterRequest{}
 	err := c.BodyParser(r)
 	if err != nil {
 		fmt.Println(err)
@@ -184,6 +187,5 @@ func (p *AIHandler) CoverLetter(c *fiber.Ctx) error {
 		fmt.Println(err)
 	}
 
-	c.SendString(coverletter)
-	return nil
+	return	c.JSON(CoverLetterResponse{CoverLetter: coverletter})
 }

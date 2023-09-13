@@ -1,13 +1,14 @@
 import Image from 'next/image'
 import Logo from '../assets/prepper-logo.png'
 import Button from './ui-kit/Button'
-import { IconPlus} from '@tabler/icons-react'
+import { IconFilePencil, IconHome, IconPlus, IconUser} from '@tabler/icons-react'
 import { cn } from '@/lib/utils'
 import { HTTPApplicatonFetcher } from '@/service/aplicationFetcher'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
 import { LogOutIcon } from 'lucide-react'
+import { Dialog, DialogContent, DialogTrigger } from './ui/dialog'
 const applicationFetcher = new HTTPApplicatonFetcher()
 export default function Sidebar() {
   const router = useRouter()
@@ -28,18 +29,24 @@ export default function Sidebar() {
         className='w-40 px-3'
       />
     </Link>
-    { // for a future milestone
-    // <ul className='flex flex-col gap-2 my-8'>
-    //   <SidebarButton>
-    //     <IconHome />
-    //     Dashboard
-    //   </SidebarButton> 
-    //   <SidebarButton>
-    //     <IconUser />
-    //     Profile
-    //   </SidebarButton> 
-    // </ul>
-    }
+    <ul className='flex flex-col gap-2 mt-8'>
+      <Dialog>
+        <DialogTrigger asChild>
+          <Button className='ml-1' variant='subtle' size='sm'>
+            <IconUser />
+            Profile
+          </Button>
+        </DialogTrigger>
+        <DialogContent className='text-gray-500'>
+          Profile functionality is not yet complete!
+        </DialogContent>
+      </Dialog>
+      <SidebarButton href='/coverletter'>
+        <IconFilePencil />
+        Cover Letter
+      </SidebarButton>
+    </ul>
+
     <button 
       className='flex items-center justify-between w-full gap-2 px-4 py-2 mt-6 rounded-md text-gray-600 font-medium text-xs hover:bg-gray-100'
       onClick={gotoNewApplication}
@@ -71,16 +78,16 @@ export default function Sidebar() {
 
 interface SidebarButton extends React.ComponentProps<'button'>{
   highlighted?: boolean
-  href?: string
+  href: string
 }
 function SidebarButton({highlighted=false, children, href, ...props}: SidebarButton) {
   return <li>
     <Link href={href || ""}>
       <Button 
-        variant='tertiary' 
-        className={cn('py-1 w-full flex gap-2 text-left text-gray-400 text-sm hover:text-blue-700', {
+        variant='subtle' 
+        className={cn('py-1 w-full flex gap-2 items-center text-left text-gray-400 text-sm', {
           "bg-blue-100": highlighted,
-          "text-blue-700": highlighted
+          "text-blue-600": highlighted
         })}
         {...props}
       >
