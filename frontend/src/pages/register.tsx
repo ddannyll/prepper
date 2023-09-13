@@ -13,9 +13,10 @@ import BeatLoader from 'react-spinners/BeatLoader'
 import { cn } from '@/lib/utils'
 import { useToast } from '@/components/ui/use-toast'
 
-type LoginInputs = {
-    username: string
-    password: string
+type RegisterInputs = {
+  username: string
+  password: string
+  confirmPassword: string
 }
 
 const labelClasses = 'font-bold text-sm mt-2 flex text-gray-700'
@@ -26,13 +27,14 @@ export default function Register() {
   const router = useRouter()
   const {login} = useUser()
   const [loading, setLoading] = useState(false)
-  const {toast} = useToast()
-  const { register, handleSubmit, formState: {errors} } = useForm<LoginInputs>()
+  const { register, handleSubmit, formState: {errors} } = useForm<RegisterInputs>({
+    reValidateMode: 'onChange'
+  })
 
-  const onSubmit: SubmitHandler<LoginInputs> = async data => {
+  const onSubmit: SubmitHandler<RegisterInputs> = async data => {
     setLoading(true)
     try {
-      const res = await backendAPI.user.signinCreate(data)
+      const res = await backendAPI.user.signupCreate(data)
       if (res.ok) {
         login({id: res.data.id as string, username: data.username})
         localStorage.setItem('token', res.data.access_token as string)
@@ -81,19 +83,33 @@ export default function Register() {
                     </span>
             }
           </label>
-          <input id="password" type="password" className={inputClasses} {...register('password', {required: true})}/>
+          <input id="password" type="password" className={inputClasses} {...register('password', {
+            required: true,
+          })}/>
 
+          <label htmlFor="confirmPassword" className={labelClasses}>
+            Confirm Password
+            <RequiredStar />
+            {errors.confirmPassword &&
+                    <span className='text-red-500 font-normal grow text-end'>
+                Passwords are not the same
+                    </span>
+            }
+          </label>
+          <input id="confirmPassword" type="password" className={inputClasses} {...register('confirmPassword', {
+            required: true,
+            validate: (value, formValues) => value === formValues.password,
+          })}/>
           <Button className={cn('mt-4 relative transition justify-center', {"text-opacity-0": loading})}> 
             <BeatLoader color='white' className={cn('transition absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-[40%]', {"opacity-0": !loading})}/> 
-            Login
+            Register
           </Button>
           <p className="text-sm">
-                    Need an account?
-            <Link href={'/register'} className="text-blue-400 hover:underline px-1">
-                        Register
+            Have an account?
+            <Link href={'/login'} className="text-blue-400 hover:underline px-1">
+              Register
             </Link>
           </p>
-        Dummy Account: daniel, daniel321
         </form>
       </div>
       <Image src={BG} alt='background graphic' className='absolute w-screen h-screen object-cover'/>
