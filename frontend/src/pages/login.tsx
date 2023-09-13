@@ -92,7 +92,6 @@ export default function Login() {
                         Register
             </Link>
           </p>
-        Dummy Account: daniel, daniel321
         </form>
       </div>
       <Image src={BG} alt='background graphic' className='absolute w-screen h-screen object-cover'/>
