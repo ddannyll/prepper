@@ -15,6 +15,7 @@ type ApplicationHandler struct {
 	SessionStore *session.Store
 	dbClient     *db.PrismaClient
 	aiService    *service.AI
+	curatedCache sync.Map
 }
 
 func NewApplicationHandler(
@@ -31,9 +32,9 @@ func NewApplicationHandler(
 }
 
 type ApplicationCreateBody struct {
-	Name           string `json:"name" validate:"required" example:"SafetyCulture"`
-	JobDescription string `json:"jobDescription" validate:"required" example:"Looking for an engineer to join our team."`
-	Questions  [][]string `json:"questions"`
+	Name           string     `json:"name" validate:"required" example:"SafetyCulture"`
+	JobDescription string     `json:"jobDescription" validate:"required" example:"Looking for an engineer to join our team."`
+	Questions      [][]string `json:"questions"`
 } //@name ApplicationCreateBody
 
 type ApplicationCreateSuccessResponse struct {
@@ -63,7 +64,6 @@ func (u *ApplicationHandler) ApplicationCreate(c *fiber.Ctx) error {
 		return err
 	}
 
-
 	createdApplication, createError := u.dbClient.Application.CreateOne(
 		db.Application.Name.Set(application.Name),
 		db.Application.JobDescription.Set(application.JobDescription),
@@ -72,9 +72,9 @@ func (u *ApplicationHandler) ApplicationCreate(c *fiber.Ctx) error {
 		),
 	).Exec(c.Context())
 	if createError != nil {
-		return createError 
+		return createError
 	}
-	
+
 	wg := sync.WaitGroup{}
 	wg.Add(len(application.Questions))
 
@@ -91,8 +91,8 @@ func (u *ApplicationHandler) ApplicationCreate(c *fiber.Ctx) error {
 			).Exec(c.Context())
 			if err != nil {
 				log.Println("failed to create question")
-			}	
-		}(&wg, i + 1, q)
+			}
+		}(&wg, i+1, q)
 	}
 	wg.Wait()
 
@@ -148,23 +148,24 @@ func (u *ApplicationHandler) ApplicationMe(c *fiber.Ctx) error {
 }
 
 type QuestionType struct {
-	Id string `json:"id"`
+	Id   string   `json:"id"`
 	Tags []string `json:"tags"`
 }
-type ApplicationQuestionResponse struct {	
+type ApplicationQuestionResponse struct {
 	Questions []QuestionType `json:"questions"`
 }
+
 // ApplicationQuestions godoc
 //
-//	@Summary	Get an user's application question types
-//	@description
-//	@Tags		application
-//  @Param applicationId  path  string true "applicationId"
-//	@Produce	json 
-//	@Success	200 {object} ApplicationQuestionResponse
-//	@Failure	401
-//  @Failure  403 "test"
-//	@Router		/application/:applicationId/questions [get]
+//		@Summary	Get an user's application question types
+//		@description
+//		@Tags		application
+//	 @Param applicationId  path  string true "applicationId"
+//		@Produce	json
+//		@Success	200 {object} ApplicationQuestionResponse
+//		@Failure	401
+//	 @Failure  403 "test"
+//		@Router		/application/:applicationId/questions [get]
 func (u *ApplicationHandler) ApplicationQuestions(c *fiber.Ctx) error {
 	userId := c.Locals("userID").(string)
 	if userId == "" {
@@ -177,6 +178,7 @@ func (u *ApplicationHandler) ApplicationQuestions(c *fiber.Ctx) error {
 		db.Application.ID.Equals(appId),
 	).Exec(c.Context())
 	if err != nil || app.OwnerID != userId {
+
 		return fiber.NewError(fiber.StatusForbidden)
 	}
 
@@ -184,13 +186,13 @@ func (u *ApplicationHandler) ApplicationQuestions(c *fiber.Ctx) error {
 		db.QuestionType.ApplicationID.Equals(app.ID),
 	).OrderBy(db.QuestionType.Number.Order(db.ASC)).Exec(c.Context())
 	if err != nil {
-	return err
+		return err
 	}
 
 	response := ApplicationQuestionResponse{Questions: []QuestionType{}}
 	for _, q := range questions {
 		response.Questions = append(response.Questions, QuestionType{
-			Id: q.ID,
+			Id:   q.ID,
 			Tags: q.Tags,
 		})
 	}
@@ -198,26 +200,36 @@ func (u *ApplicationHandler) ApplicationQuestions(c *fiber.Ctx) error {
 }
 
 type GeneratedQuestion struct {
-	Tags []string `json:"tags"`
-	QuestionPrompt string `json:"questionPrompt"`
+	Tags           []string `json:"tags"`
+	QuestionPrompt string   `json:"questionPrompt"`
+	AudioLink      []byte   `json:"audioLink"`
 }
+
 // GetAIQuestions godoc
 //
-//	@Summary	Use AI to generate questions based on questions tags in a specified application
-//	@description
-//	@Tags		application
-//  @Param applicationId  path  string true "applicationId"
-//	@Produce	json 
-//	@Success	200 {object} []GeneratedQuestion  
-//	@Failure	401
-//  @Failure  403 "test"
-//	@Router		/application/:applicationId/questions/generate [get]
+//		@Summary	Use AI to generate questions based on questions tags in a specified application
+//		@description
+//		@Tags		application
+//	 @Param applicationId  path  string true "applicationId"
+//		@Produce	json
+//		@Success	200 {object} []GeneratedQuestion
+//		@Failure	401
+//	 @Failure  403 "test"
+//		@Router		/application/:applicationId/questions/generate [get]
 func (u *ApplicationHandler) GetAIQuestions(c *fiber.Ctx) error {
 	userId := c.Locals("userID").(string)
 	if userId == "" {
 		return fiber.ErrUnauthorized
 	}
 	appId := c.Params("applicationId")
+
+	cacheKey := appId // You can expand on this key as needed.
+	if data, found := u.curatedCache.Load(cacheKey); found {
+		log.Println("hit cache")
+
+		return c.JSON(data.([]GeneratedQuestion))
+	}
+
 	app, err := u.dbClient.Application.FindUnique(
 		db.Application.ID.Equals(appId),
 	).Exec(c.Context())
@@ -229,7 +241,7 @@ func (u *ApplicationHandler) GetAIQuestions(c *fiber.Ctx) error {
 		db.QuestionType.ApplicationID.Equals(app.ID),
 	).OrderBy(db.QuestionType.Number.Order(db.ASC)).Exec(c.Context())
 	if err != nil {
-	  return err
+		return err
 	}
 
 	questions := [][]string{}
@@ -246,12 +258,27 @@ func (u *ApplicationHandler) GetAIQuestions(c *fiber.Ctx) error {
 		return fiber.ErrInternalServerError
 	}
 	curatedQuestionsTagged := []GeneratedQuestion{}
+
+	questionsToRead := []([]byte){}
+	for _, q := range curatedQuestions {
+		// send the questions to read to elevenlabs
+		audioData, err := u.aiService.Text2Voice(c.Context(), q)
+		if err != nil {
+			log.Println(err)
+			// empty audio data
+			questionsToRead = append(questionsToRead, []byte{})
+		}
+		questionsToRead = append(questionsToRead, audioData)
+	}
+
 	for i, curatedQuestion := range curatedQuestions {
 		curatedQuestionsTagged = append(curatedQuestionsTagged, GeneratedQuestion{
 			QuestionPrompt: curatedQuestion,
-			Tags: questions[i],
+			Tags:           questions[i],
+			AudioLink:      questionsToRead[i],
 		})
 	}
 
+	u.curatedCache.Store(cacheKey, curatedQuestionsTagged)
 	return c.JSON(curatedQuestionsTagged)
 }

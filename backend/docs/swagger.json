@@ -434,7 +434,6 @@
             "properties": {
                 "password": {
                     "type": "string",
-                    "minLength": 6,
                     "example": "daniel321"
                 },
                 "username": {
@@ -537,6 +536,12 @@
         "handlers.GeneratedQuestion": {
             "type": "object",
             "properties": {
+                "audioLink": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
                 "questionPrompt": {
                     "type": "string"
                 },
@@ -594,10 +599,5 @@
             "name": "Authorization",
             "in": "header"
         }
-    },
-    "security": [
-        {
-            "ApiKeyAuth": []
-        }
-    ]
+    }
 }
