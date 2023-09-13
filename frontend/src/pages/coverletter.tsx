@@ -26,7 +26,14 @@ export default function CoverLetter() {
 
   const onSubmit: SubmitHandler<Inputs> = async data => {
     setCoverletter("Generating Cover Letter...")
-    const cl = await backendAPI.ai.coverletterCreate(data)
+    const cl = await backendAPI.ai.coverletterCreate(data,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+      }
+    )
     setCoverletter(cl.data.coverLetter || "")
   }
 
