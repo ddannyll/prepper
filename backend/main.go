@@ -70,8 +70,8 @@ func newFiberServer(
 
 	// Group these together later...
 	userGroup := app.Group("/user")
-	userGroup.Post("/signup", userHandler.SignUpUser)
-	userGroup.Post("/signin", userHandler.SignInUser)
+	userGroup.Post("/signup", authMiddleware.IPRateLimitRoute, userHandler.SignUpUser)
+	userGroup.Post("/signin", authMiddleware.IPRateLimitRoute, userHandler.SignInUser)
 	userGroup.Post("/signout", userHandler.SignOutUser)
 
 	userGroup.Get("/healthcheck", authMiddleware.AuthenticateRoute, userHandler.HealthCheckUser)
@@ -87,11 +87,11 @@ func newFiberServer(
 	applicationGroup.Get("/:applicationId/questions/generate", authMiddleware.AuthenticateRoute, applicationHandler.GetAIQuestions)
 
 	AIGroup := app.Group("/ai")
-	AIGroup.Get("/getQuestions", aiHandler.GetQuestions)
-	AIGroup.Post("/analyse", aiHandler.Analyse)
-	AIGroup.Post("/voice2text", aiHandler.Voice2Text)
-	AIGroup.Post("/text2voice", aiHandler.GetAudio)
-	AIGroup.Post("/coverletter", aiHandler.CoverLetter)
+	AIGroup.Get("/getQuestions", authMiddleware.AuthenticateRoute, aiHandler.GetQuestions)
+	AIGroup.Post("/analyse", authMiddleware.AuthenticateRoute, aiHandler.Analyse)
+	AIGroup.Post("/voice2text", authMiddleware.AuthenticateRoute, aiHandler.Voice2Text)
+	AIGroup.Post("/text2voice", authMiddleware.AuthenticateRoute, aiHandler.GetAudio)
+	AIGroup.Post("/coverletter", authMiddleware.AuthenticateRoute, aiHandler.CoverLetter)
 
 	// applicationGroup.Get("/myapplications", authMiddleware.AuthenticateRoute)
 
