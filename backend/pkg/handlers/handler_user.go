@@ -29,7 +29,7 @@ func NewUserHandler(sessionStore *session.Store, config config.EnvVars, dbClient
 
 type userCredentialsBody struct {
 	Username string `json:"username" validate:"required" example:"daniel"`
-	Password string `json:"password" validate:"required,min=6" example:"daniel321"`
+	Password string `json:"password" validate:"required" example:"daniel321"`
 } //@name UserCredentials
 
 type userSigninSuccessResponse struct {

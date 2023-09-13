@@ -20,7 +20,14 @@ export class MockInsightFetcher implements InsightFetcher {
 
 export class HTTPInsightFetcher implements InsightFetcher {
   async getQAInsight(question:string, answer: string) {
-    const resp = await backendAPI.ai.analyseCreate({question, answer}) 
+    const resp = await backendAPI.ai.analyseCreate({question, answer},
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+      }
+    ) 
     if (!resp.ok) {
       throw new Error("failed to fetch")
     }
