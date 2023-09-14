@@ -111,8 +111,8 @@ func (a *AuthMiddleware) isRateLimited(userID string) bool {
 }
 
 const (
-	IPRateLimitPeriod   = 24 * 60 * 60 // seconds, which equals 1 day
-	IPRateLimitRequests = 5            // max requests per day
+	IPRateLimitPeriod   = 2 * 60 // seconds, which equals 2 minutes
+	IPRateLimitRequests = 10            // max requests per ^
 )
 
 type IPRateLimitData struct {
