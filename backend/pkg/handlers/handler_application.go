@@ -282,7 +282,6 @@ func (u *ApplicationHandler) GetAIQuestions(c *fiber.Ctx) error {
 			}
 			questionsToRead = append(questionsToRead, audioData)
 		}
-
 	}
 
 	for i, curatedQuestion := range curatedQuestions {
@@ -294,5 +293,6 @@ func (u *ApplicationHandler) GetAIQuestions(c *fiber.Ctx) error {
 	}
 
 	u.curatedCache.Store(cacheKey, curatedQuestionsTagged)
+
 	return c.JSON(curatedQuestionsTagged)
 }
