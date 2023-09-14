@@ -21,6 +21,7 @@ export default function Sidebar() {
     }
   })
   const gotoNewApplication = () => {
+    setSidebarOpen(false)
     router.push('/applications/new')
   }
   return <div>
