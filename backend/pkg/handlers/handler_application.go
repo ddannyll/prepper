@@ -237,7 +237,7 @@ func (u *ApplicationHandler) GetAIQuestions(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusForbidden)
 	}
 
-	if app.Name == "Willy Wonka's chocolate factory" {
+	if app.Name == "Willy Wonka's Chocolate Factory" {
 		cacheKey = "WillyWonka"
 		if data, found := u.curatedCache.Load(cacheKey); found {
 			log.Println("hit cache")
