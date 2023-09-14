@@ -19,9 +19,8 @@ const questionService = new HTTPQuestionFetcher();
 
 import React, { useState, useEffect } from "react";
 
-function AudioPlayer({ base64Data }: { base64Data?: string }) {
+function AudioPlayerUnMemo({ base64Data }: { base64Data?: string }) {
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
-
   const audioRef = React.createRef<HTMLAudioElement>();
 
   useEffect(() => {
@@ -68,6 +67,8 @@ function AudioPlayer({ base64Data }: { base64Data?: string }) {
   );
 }
 
+const AudioPlayer = React.memo(AudioPlayerUnMemo);
+
 const InterviewPage = () => {
   const router = useRouter();
 
@@ -79,9 +80,6 @@ const InterviewPage = () => {
   const [keyboardOn, setKeyboardOn] = useState(false);
   const applicationId = router.query.applicationId as string;
   const [keyboardVal, setKeyboardVal] = useState("");
-  const [audioLoading, setAudioLoading] = useState(false);
-
-  const [audioData, setAudioData] = useState("");
 
   const {
     data: questions,
