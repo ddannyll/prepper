@@ -237,6 +237,14 @@ func (u *ApplicationHandler) GetAIQuestions(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusForbidden)
 	}
 
+	if app.Name == "Willy Wonka's chocolate factory" {
+		cacheKey = "WillyWonka"
+		if data, found := u.curatedCache.Load(cacheKey); found {
+			log.Println("hit cache")
+			return c.JSON(data.([]GeneratedQuestion))
+		}
+	}
+
 	questionsTags, err := u.dbClient.QuestionType.FindMany(
 		db.QuestionType.ApplicationID.Equals(app.ID),
 	).OrderBy(db.QuestionType.Number.Order(db.ASC)).Exec(c.Context())
