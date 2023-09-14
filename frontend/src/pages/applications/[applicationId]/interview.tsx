@@ -128,6 +128,7 @@ const InterviewPage = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/octet-stream",
+          Authorization: "Bearer " + localStorage.getItem("token"),
         },
         body: audioBlob,
       });
