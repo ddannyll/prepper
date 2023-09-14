@@ -237,8 +237,10 @@ func (u *ApplicationHandler) GetAIQuestions(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusForbidden)
 	}
 
+	log.Println(app.Name)
+
 	if app.Name == "Willy Wonka's Chocolate Factory" {
-		cacheKey = "WillyWonka"
+		cacheKey = "Willy Wonka's Chocolate Factory"
 		if data, found := u.curatedCache.Load(cacheKey); found {
 			log.Println("hit cache")
 			return c.JSON(data.([]GeneratedQuestion))
@@ -270,7 +272,7 @@ func (u *ApplicationHandler) GetAIQuestions(c *fiber.Ctx) error {
 	questionsToRead := []([]byte){}
 	for _, q := range curatedQuestions {
 
-		if app.Name == "Willy Wonka's Chocolate Factory" {
+		if app.Name != "Willy Wonka's Chocolate Factory" {
 			questionsToRead = append(questionsToRead, []byte{})
 		} else {
 			// send the questions to read to elevenlabs
