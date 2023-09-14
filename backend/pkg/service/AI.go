@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"math/rand"
 	"strings"
 	"time"
 
@@ -180,9 +181,15 @@ func (o *AI) Text2Voice(ctx context.Context, questionread string) ([]byte, error
 		Text:    questionread,
 		ModelID: "eleven_monolingual_v1",
 	}
+	//pick a random voice from JpSZVyDoK7Yi7NHGnId0, JpSZVyDoK7Yi7NHGnId1, JpSZVyDoK7Yi7NHGnId2
+
+	voiceChoice := []string{"JpSZVyDoK7Yi7NHGnId0", "21m00Tcm4TlvDq8ikWAM"}
+	// pick a random voice
+	randomIndex := rand.Intn(len(voiceChoice))
+	voiceId := voiceChoice[randomIndex]
 
 	// Call the TextToSpeech method on the client, using the "Adam"'s voice ID.
-	audio, err := client.TextToSpeech("JpSZVyDoK7Yi7NHGnId0", ttsReq)
+	audio, err := client.TextToSpeech(voiceId, ttsReq)
 	if err != nil {
 		return nil, err
 	}

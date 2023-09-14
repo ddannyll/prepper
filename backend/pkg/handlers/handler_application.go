@@ -269,14 +269,20 @@ func (u *ApplicationHandler) GetAIQuestions(c *fiber.Ctx) error {
 
 	questionsToRead := []([]byte){}
 	for _, q := range curatedQuestions {
-		// send the questions to read to elevenlabs
-		audioData, err := u.aiService.Text2Voice(c.Context(), q)
-		if err != nil {
-			log.Println(err)
-			// empty audio data
+
+		if app.Name == "Willy Wonka's Chocolate Factory" {
 			questionsToRead = append(questionsToRead, []byte{})
+		} else {
+			// send the questions to read to elevenlabs
+			audioData, err := u.aiService.Text2Voice(c.Context(), q)
+			if err != nil {
+				log.Println(err)
+				// empty audio data
+				questionsToRead = append(questionsToRead, []byte{})
+			}
+			questionsToRead = append(questionsToRead, audioData)
 		}
-		questionsToRead = append(questionsToRead, audioData)
+
 	}
 
 	for i, curatedQuestion := range curatedQuestions {
