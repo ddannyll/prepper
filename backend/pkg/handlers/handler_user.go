@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/ddannyll/prepper/db"
-	"github.com/ddannyll/prepper/pkg/config"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/session"
 	"github.com/golang-jwt/jwt"
-
 	"golang.org/x/crypto/bcrypt"
+
+	"github.com/ddannyll/prepper/db"
+	"github.com/ddannyll/prepper/pkg/config"
 )
 
 type UserHandler struct {
@@ -19,7 +19,11 @@ type UserHandler struct {
 	jwtSecret    string
 }
 
-func NewUserHandler(sessionStore *session.Store, config config.EnvVars, dbClient *db.PrismaClient) *UserHandler {
+func NewUserHandler(
+	sessionStore *session.Store,
+	config config.EnvVars,
+	dbClient *db.PrismaClient,
+) *UserHandler {
 	return &UserHandler{
 		SessionStore: sessionStore,
 		dbClient:     dbClient,
@@ -33,7 +37,7 @@ type userCredentialsBody struct {
 } //@name UserCredentials
 
 type userSigninSuccessResponse struct {
-	Id          string `json:"id" example:"1337"`
+	Id          string `json:"id"           example:"1337"`
 	AccessToken string `json:"access_token"`
 } //@name UserSigninResponse
 
@@ -73,7 +77,6 @@ func (u *UserHandler) SignUpUser(c *fiber.Ctx) error {
 	})
 
 	tokenString, err := token.SignedString([]byte(u.jwtSecret))
-
 	if err != nil {
 
 		log.Println(err)
@@ -84,7 +87,6 @@ func (u *UserHandler) SignUpUser(c *fiber.Ctx) error {
 		Id:          fmt.Sprint(createdUser.ID),
 		AccessToken: tokenString,
 	})
-
 }
 
 // Signin godoc
@@ -99,14 +101,13 @@ func (u *UserHandler) SignUpUser(c *fiber.Ctx) error {
 //	@Failure	401	"Invalid Credentials"
 //	@Router		/user/signin [post]
 func (u *UserHandler) SignInUser(c *fiber.Ctx) error {
-
 	var user userCredentialsBody
 	if err := parseAndValidateBody(c, &user); err != nil {
 		return err
 	}
 
-
-	userFromDB, err := u.dbClient.User.FindUnique(db.User.Username.Equals(user.Username)).Exec(c.Context())
+	userFromDB, err := u.dbClient.User.FindUnique(db.User.Username.Equals(user.Username)).
+		Exec(c.Context())
 	// if err != nil {
 	//
 	// 	// if user is daniel, create him
@@ -128,7 +129,7 @@ func (u *UserHandler) SignInUser(c *fiber.Ctx) error {
 	// }
 	if err != nil || !checkPasswordHash(user.Password, userFromDB.HashedPassword) {
 		return fiber.NewError(fiber.StatusUnauthorized, "invalid username and/or password")
-	}	
+	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"user_id": userFromDB.ID,
 		"auth":    true,
@@ -178,7 +179,7 @@ func (u *UserHandler) SignOutUser(c *fiber.Ctx) error {
 //	@Failure	401	"if not signed in"
 //	@Router		/user/healthcheck [get]
 func (u *UserHandler) HealthCheckUser(c *fiber.Ctx) error {
-	return c.JSON(fiber.Map{"success": true, "userID":c.Locals("userID")})
+	return c.JSON(fiber.Map{"success": true, "userID": c.Locals("userID")})
 }
 
 func hashPassword(password string) (string, error) {

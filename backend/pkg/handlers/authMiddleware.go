@@ -2,14 +2,14 @@ package handlers
 
 import (
 	"fmt"
-	"log"
 	"strings"
 	"time"
 
-	"github.com/ddannyll/prepper/pkg/config"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/session"
 	"github.com/golang-jwt/jwt"
+
+	"github.com/ddannyll/prepper/pkg/config"
 )
 
 type AuthMiddleware struct {
@@ -17,19 +17,13 @@ type AuthMiddleware struct {
 	jwtSecret string
 }
 
-func NewAuthMiddleware(store *session.Store,
-	config config.EnvVars,
-
-) *AuthMiddleware {
+func NewAuthMiddleware(store *session.Store, config config.EnvVars) *AuthMiddleware {
 	return &AuthMiddleware{Store: store, jwtSecret: config.JWT_SECRET}
 }
 
 func (a *AuthMiddleware) AuthenticateRoute(c *fiber.Ctx) error {
-
 	// get the url
 	url := c.Path()
-
-	log.Println("Hi Auth")
 
 	authHeader := c.Get("Authorization")
 
@@ -38,7 +32,10 @@ func (a *AuthMiddleware) AuthenticateRoute(c *fiber.Ctx) error {
 	}
 	headerParts := strings.Split(authHeader, " ")
 	if len(headerParts) != 2 || headerParts[0] != "Bearer" {
-		return fiber.NewError(fiber.StatusUnauthorized, "Authorization header format must be Bearer {token}")
+		return fiber.NewError(
+			fiber.StatusUnauthorized,
+			"Authorization header format must be Bearer {token}",
+		)
 	}
 
 	token, err := jwt.Parse(headerParts[1], func(token *jwt.Token) (interface{}, error) {
@@ -47,7 +44,6 @@ func (a *AuthMiddleware) AuthenticateRoute(c *fiber.Ctx) error {
 		}
 		return []byte(a.jwtSecret), nil
 	})
-
 	if err != nil {
 		return fiber.NewError(fiber.StatusUnauthorized, "Invalid token")
 	}
@@ -112,7 +108,7 @@ func (a *AuthMiddleware) isRateLimited(userID string) bool {
 
 const (
 	IPRateLimitPeriod   = 2 * 60 // seconds, which equals 2 minutes
-	IPRateLimitRequests = 10            // max requests per ^
+	IPRateLimitRequests = 10     // max requests per ^
 )
 
 type IPRateLimitData struct {
@@ -148,7 +144,6 @@ func (a *AuthMiddleware) isIPRateLimited(ip string) bool {
 }
 
 func (a *AuthMiddleware) IPRateLimitRoute(c *fiber.Ctx) error {
-
 	// get the real ip address, after cloudflare and other proxies
 	ip := c.IP()
 

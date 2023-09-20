@@ -26,5 +26,4 @@ func (p *PingHandler) Ping(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{
 		"message": c.Locals("userID"),
 	})
-
 }

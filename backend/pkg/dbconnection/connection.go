@@ -39,5 +39,4 @@ func GetDBClient() *db.PrismaClient {
 	}
 
 	panic(err)
-
 }

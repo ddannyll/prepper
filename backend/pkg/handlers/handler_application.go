@@ -4,11 +4,12 @@ import (
 	"log"
 	"sync"
 
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/session"
+
 	"github.com/ddannyll/prepper/db"
 	"github.com/ddannyll/prepper/pkg/config"
 	"github.com/ddannyll/prepper/pkg/service"
-	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/session"
 )
 
 type ApplicationHandler struct {
@@ -32,7 +33,7 @@ func NewApplicationHandler(
 }
 
 type ApplicationCreateBody struct {
-	Name           string     `json:"name" validate:"required" example:"SafetyCulture"`
+	Name           string     `json:"name"           validate:"required" example:"SafetyCulture"`
 	JobDescription string     `json:"jobDescription" validate:"required" example:"Looking for an engineer to join our team."`
 	Questions      [][]string `json:"questions"`
 } //@name ApplicationCreateBody
@@ -40,9 +41,9 @@ type ApplicationCreateBody struct {
 type ApplicationCreateSuccessResponse struct {
 	Id string `json:"id" example:"1337"`
 
-	Name           string `json:"name" validate:"required" example:"SafetyCulture"`
+	Name           string `json:"name"           validate:"required" example:"SafetyCulture"`
 	JobDescription string `json:"jobDescription" validate:"required" example:"Looking for an engineer to join our team."`
-	CreatedAt      string `json:"createdAt" example:"2021-07-01T00:00:00.000Z"`
+	CreatedAt      string `json:"createdAt"                          example:"2021-07-01T00:00:00.000Z"`
 } //@name ApplicationCreateResponse
 
 // CreateApplication godoc
@@ -56,7 +57,6 @@ type ApplicationCreateSuccessResponse struct {
 //	@Success		200	{object} ApplicationCreateSuccessResponse
 //	@Router			/application/create [post]
 func (u *ApplicationHandler) ApplicationCreate(c *fiber.Ctx) error {
-
 	userID := c.Locals("userID").(string)
 
 	var application ApplicationCreateBody
@@ -178,7 +178,6 @@ func (u *ApplicationHandler) ApplicationQuestions(c *fiber.Ctx) error {
 		db.Application.ID.Equals(appId),
 	).Exec(c.Context())
 	if err != nil || app.OwnerID != userId {
-
 		return fiber.NewError(fiber.StatusForbidden)
 	}
 
@@ -259,7 +258,12 @@ func (u *ApplicationHandler) GetAIQuestions(c *fiber.Ctx) error {
 		questions = append(questions, questionTags.Tags)
 	}
 
-	curatedQuestions, err := u.aiService.GetCuratedQuestions(c.Context(), app.Name, app.JobDescription, questions)
+	curatedQuestions, err := u.aiService.GetCuratedQuestions(
+		c.Context(),
+		app.Name,
+		app.JobDescription,
+		questions,
+	)
 	if err != nil {
 		return err
 	}
@@ -271,7 +275,6 @@ func (u *ApplicationHandler) GetAIQuestions(c *fiber.Ctx) error {
 
 	questionsToRead := []([]byte){}
 	for _, q := range curatedQuestions {
-
 		if app.Name != "Willy Wonka's Chocolate Factory" {
 			questionsToRead = append(questionsToRead, []byte{})
 		} else {

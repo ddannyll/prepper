@@ -7,8 +7,9 @@ import (
 	"log"
 	"os"
 
-	"github.com/ddannyll/prepper/pkg/service"
 	"github.com/gofiber/fiber/v2"
+
+	"github.com/ddannyll/prepper/pkg/service"
 )
 
 type AIHandler struct {
@@ -75,7 +76,6 @@ func (p *AIHandler) Analyse(c *fiber.Ctx) error {
 		Question: r.Question,
 		Answer:   r.Answer,
 	})
-
 	if err != nil {
 		fmt.Println(err)
 		return fiber.NewError(fiber.StatusInternalServerError, "failed to process AI requst")
@@ -107,7 +107,10 @@ func (p *AIHandler) Voice2Text(c *fiber.Ctx) error {
 	// Read the audio blob from the request body and write it to the temp file
 	_, err = io.Copy(tempFile, bytes.NewReader(c.Body()))
 	if err != nil {
-		return fiber.NewError(fiber.StatusInternalServerError, "failed to copy audio data to custom file")
+		return fiber.NewError(
+			fiber.StatusInternalServerError,
+			"failed to copy audio data to custom file",
+		)
 	}
 
 	log.Println(tempFile.Name())
@@ -166,7 +169,7 @@ type CoverLetterResponse struct {
 // @Accept json
 // @Param CoverLetterDetails body CoverLetterRequest true "cover letter request"
 // @Produce json
-// @Success 200 {object} CoverLetterResponse 
+// @Success 200 {object} CoverLetterResponse
 // @Router /ai/coverletter [post]
 func (p *AIHandler) CoverLetter(c *fiber.Ctx) error {
 	r := &CoverLetterRequest{}
@@ -182,10 +185,9 @@ func (p *AIHandler) CoverLetter(c *fiber.Ctx) error {
 		Reasons:    r.Reasons,
 		Experience: r.Experience,
 	})
-
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	return	c.JSON(CoverLetterResponse{CoverLetter: coverletter})
+	return c.JSON(CoverLetterResponse{CoverLetter: coverletter})
 }
