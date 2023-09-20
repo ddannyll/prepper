@@ -285,6 +285,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/ApplicationCreateResponse'
+        "400":
+          description: failed to create app
       summary: Create an application for the user
       tags:
       - application
@@ -387,6 +389,8 @@ paths:
       summary: Sign a user up to dancord
       tags:
       - user
+security:
+- ApiKeyAuth: []
 securityDefinitions:
   ApiKeyAuth:
     in: header

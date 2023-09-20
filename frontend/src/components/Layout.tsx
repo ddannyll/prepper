@@ -1,7 +1,7 @@
 import { useRouter } from "next/router";
 import Sidebar from "./Sidebar";
-import { Toaster } from "./ui/toaster";
 import Link from "next/link";
+import { Toaster } from "react-hot-toast";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -33,9 +33,9 @@ export default function Layout({ children }: LayoutProps) {
   //Dashboard
   return (
     <div className="w-screen h-screen flex bg-gray-50">
-      <Toaster />
       <Sidebar />
       {children}
+      <Toaster position="top-right" />
     </div>
   );
 }

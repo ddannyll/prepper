@@ -319,12 +319,14 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @name AnalyseCreate
      * @summary analyse an answer to a question
      * @request POST:/ai/analyse
+     * @secure
      */
     analyseCreate: (QAPair: HandlersAnalysisRequest, params: RequestParams = {}) =>
       this.request<ServiceAnalysis, any>({
         path: `/ai/analyse`,
         method: "POST",
         body: QAPair,
+        secure: true,
         type: ContentType.Json,
         format: "json",
         ...params,
@@ -337,12 +339,14 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @name CoverletterCreate
      * @summary creates personalised cover letter
      * @request POST:/ai/coverletter
+     * @secure
      */
     coverletterCreate: (CoverLetterDetails: HandlersCoverLetterRequest, params: RequestParams = {}) =>
       this.request<HandlersCoverLetterResponse, any>({
         path: `/ai/coverletter`,
         method: "POST",
         body: CoverLetterDetails,
+        secure: true,
         type: ContentType.Json,
         format: "json",
         ...params,
@@ -355,11 +359,13 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @name Text2VoiceCreate
      * @summary converts text to voice
      * @request POST:/ai/text2voice
+     * @secure
      */
     text2VoiceCreate: (params: RequestParams = {}) =>
       this.request<any, any>({
         path: `/ai/text2voice`,
         method: "POST",
+        secure: true,
         type: ContentType.Json,
         ...params,
       }),
@@ -371,11 +377,13 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @name Voice2TextCreate
      * @summary convert voice to text
      * @request POST:/ai/voice2text
+     * @secure
      */
     voice2TextCreate: (params: RequestParams = {}) =>
       this.request<ServiceVoice2TextResponse, any>({
         path: `/ai/voice2text`,
         method: "POST",
+        secure: true,
         format: "json",
         ...params,
       }),
@@ -388,11 +396,13 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @name ApplicationIdQuestionsList
      * @summary Get an user's application question types
      * @request GET:/application/:applicationId/questions
+     * @secure
      */
     applicationIdQuestionsList: (applicationId: string, params: RequestParams = {}) =>
       this.request<HandlersApplicationQuestionResponse, void>({
         path: `/application/${applicationId}/questions`,
         method: "GET",
+        secure: true,
         format: "json",
         ...params,
       }),
@@ -404,11 +414,13 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @name ApplicationIdQuestionsGenerateList
      * @summary Use AI to generate questions based on questions tags in a specified application
      * @request GET:/application/:applicationId/questions/generate
+     * @secure
      */
     applicationIdQuestionsGenerateList: (applicationId: string, params: RequestParams = {}) =>
       this.request<HandlersGeneratedQuestion[], void>({
         path: `/application/${applicationId}/questions/generate`,
         method: "GET",
+        secure: true,
         format: "json",
         ...params,
       }),
@@ -420,12 +432,14 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @name CreateCreate
      * @summary Create an application for the user
      * @request POST:/application/create
+     * @secure
      */
     createCreate: (ApplicationCreateBody: ApplicationCreateBody, params: RequestParams = {}) =>
-      this.request<ApplicationCreateResponse, any>({
+      this.request<ApplicationCreateResponse, void>({
         path: `/application/create`,
         method: "POST",
         body: ApplicationCreateBody,
+        secure: true,
         type: ContentType.Json,
         format: "json",
         ...params,
@@ -438,11 +452,13 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @name GetApplication
      * @summary Get user's applications
      * @request GET:/application/me
+     * @secure
      */
     getApplication: (params: RequestParams = {}) =>
       this.request<DbInnerApplication[], void>({
         path: `/application/me`,
         method: "GET",
+        secure: true,
         format: "json",
         ...params,
       }),
@@ -474,11 +490,13 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @name HealthcheckList
      * @summary Check if a user is signed in
      * @request GET:/user/healthcheck
+     * @secure
      */
     healthcheckList: (params: RequestParams = {}) =>
       this.request<void, void>({
         path: `/user/healthcheck`,
         method: "GET",
+        secure: true,
         ...params,
       }),
 
@@ -489,12 +507,14 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @name SigninCreate
      * @summary Sign a user
      * @request POST:/user/signin
+     * @secure
      */
     signinCreate: (SignInBody: UserCredentials, params: RequestParams = {}) =>
       this.request<UserSigninResponse, void>({
         path: `/user/signin`,
         method: "POST",
         body: SignInBody,
+        secure: true,
         type: ContentType.Json,
         format: "json",
         ...params,
@@ -507,11 +527,13 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @name SignoutCreate
      * @summary Sign a user out of dancord
      * @request POST:/user/signout
+     * @secure
      */
     signoutCreate: (params: RequestParams = {}) =>
       this.request<void, any>({
         path: `/user/signout`,
         method: "POST",
+        secure: true,
         ...params,
       }),
 
@@ -522,12 +544,14 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @name SignupCreate
      * @summary Sign a user up to dancord
      * @request POST:/user/signup
+     * @secure
      */
     signupCreate: (SignUpBody: UserCredentials, params: RequestParams = {}) =>
       this.request<UserSigninResponse, any>({
         path: `/user/signup`,
         method: "POST",
         body: SignUpBody,
+        secure: true,
         type: ContentType.Json,
         format: "json",
         ...params,

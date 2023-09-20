@@ -5,11 +5,11 @@ import QuestionTypeWithTags from "@/components/QuestionTypeWithTags";
 import { useState } from "react";
 import { v4 as uuid } from "uuid";
 import { HTTPApplicatonFetcher } from "@/service/aplicationFetcher";
-import { useToast } from "@/components/ui/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/router";
 import BeatLoader from "react-spinners/BeatLoader";
-import { cn } from "@/lib/utils";
+import { cn, getErrorMessage } from "@/lib/utils";
+import { toast } from "react-hot-toast";
 interface FormValues {
   jobName: string;
   jobDescription: string;
@@ -20,7 +20,6 @@ export default function NewApplication() {
     { tags: [] },
   ]);
   const [loading, setLoading] = useState(false);
-  const { toast } = useToast();
   const router = useRouter();
   const newQuestion = () => {
     setQuestions([...questions, { tags: [] }]);
@@ -45,10 +44,7 @@ export default function NewApplication() {
       queryClient.invalidateQueries(["applications"]);
       router.push(`/applications/${app.id}`);
     } catch (err) {
-      toast({
-        variant: "destructive",
-        title: "Failed to create application",
-      });
+      toast.error(getErrorMessage(err));
     } finally {
       setLoading(false);
     }

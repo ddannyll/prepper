@@ -211,6 +211,9 @@
                         "schema": {
                             "$ref": "#/definitions/ApplicationCreateResponse"
                         }
+                    },
+                    "400": {
+                        "description": "failed to create app"
                     }
                 }
             }
@@ -599,5 +602,10 @@
             "name": "Authorization",
             "in": "header"
         }
-    }
+    },
+    "security": [
+        {
+            "ApiKeyAuth": []
+        }
+    ]
 }

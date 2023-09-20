@@ -48,20 +48,21 @@ type ApplicationCreateSuccessResponse struct {
 
 // CreateApplication godoc
 //
-//	@Summary		Create an application for the user
-//	@description	an application has some properties
-//	@Tags			application
-//	@Accept			json
-//	@Param			ApplicationCreateBody	body ApplicationCreateBody true "Application"
-//	@Produce		json
-//	@Success		200	{object} ApplicationCreateSuccessResponse
-//	@Router			/application/create [post]
+//		@Summary		Create an application for the user
+//		@description	an application has some properties
+//		@Tags			application
+//		@Accept			json
+//		@Param			ApplicationCreateBody	body ApplicationCreateBody true "Application"
+//		@Produce		json
+//		@Success		200	{object} ApplicationCreateSuccessResponse
+//	 @Failure    400 "failed to create app"
+//		@Router			/application/create [post]
 func (u *ApplicationHandler) ApplicationCreate(c *fiber.Ctx) error {
 	userID := c.Locals("userID").(string)
 
 	var application ApplicationCreateBody
 	if err := parseAndValidateBody(c, &application); err != nil {
-		return err
+		return c.Status(fiber.StatusBadRequest).JSON(err)
 	}
 
 	createdApplication, createError := u.dbClient.Application.CreateOne(
