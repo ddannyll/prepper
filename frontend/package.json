@@ -60,6 +60,7 @@
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-only-warn": "^1.1.0",
     "eslint-plugin-storybook": "^0.6.13",
+    "eslint-plugin-unused-imports": "^3.0.0",
     "storybook": "^7.4.0",
     "typescript": "5.2.2"
   }

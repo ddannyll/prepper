@@ -2,11 +2,10 @@ import AnswerControls from "@/components/AnswerControls";
 import InterviewInsights from "@/components/InterviewInsights";
 import Keyboard from "@/components/Keyboard";
 import QuestionCard from "@/components/QuestionCard";
-import useQuestionPlayer, { Question } from "@/hooks/useQuestionPlayer";
+import useQuestionPlayer from "@/hooks/useQuestionPlayer";
 import { useQuestionReader } from "@/hooks/useQuestionReader";
 import {
   HTTPQuestionFetcher,
-  MockQuestionFetcher,
 } from "@/service/questionFetcher";
 import { BASE_URL } from "@/service/API";
 import { useQuery } from "@tanstack/react-query";

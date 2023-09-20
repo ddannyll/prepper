@@ -8,7 +8,7 @@ interface QuestionCardProps {
   promptReadIndex?: number;
   tags: string[];
   className?: string;
-  skipQuestion?: ()=>void
+  skipQuestion?: () => void;
 }
 
 export default function QuestionCard({
@@ -37,9 +37,10 @@ export default function QuestionCard({
         prompt={prompt}
         promptReadIndex={promptReadIndex}
       />
-      <button 
+      <button
         onClick={skipQuestion}
-        className="place-self-end text-sm text-blue-500 font-medium py-0.5 px-2.5 rounded hover:bg-blue-100 active:translate-y-0.5">
+        className="place-self-end text-sm text-blue-500 font-medium py-0.5 px-2.5 rounded hover:bg-blue-100 active:translate-y-0.5"
+      >
         Skip question
       </button>
     </div>
@@ -90,7 +91,6 @@ export function QuestionCardMainSection({
     </>
   );
 }
-
 
 interface ReadingWordsProps {
   words: string[];

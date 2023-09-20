@@ -1,5 +1,5 @@
-import { v4 as uuid } from 'uuid';
-import { useEffect, useMemo, useState } from "react";
+import { v4 as uuid } from "uuid";
+import { useMemo, useState } from "react";
 import { QuestionCardMainSection, QuestionNumber } from "./QuestionCard";
 import {
   IconAlertTriangle,
@@ -9,42 +9,45 @@ import {
   IconThumbUp,
   IconWand,
 } from "@tabler/icons-react";
-import IconButton from './ui-kit/IconButton';
-import { HTTPInsightFetcher, MockInsightFetcher } from "@/service/insightFetcher";
-import { QuestionAnswerPair } from '@/hooks/useQuestionPlayer';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Skeleton } from './ui/skeleton';
+import IconButton from "./ui-kit/IconButton";
+import {
+  HTTPInsightFetcher,
+} from "@/service/insightFetcher";
+import { QuestionAnswerPair } from "@/hooks/useQuestionPlayer";
+import { useQuery } from "@tanstack/react-query";
+import { Skeleton } from "./ui/skeleton";
 
 // const insightFetcher = new MockInsightFetcher()
-const insightFetcher = new HTTPInsightFetcher()
+const insightFetcher = new HTTPInsightFetcher();
 
 interface InterviewInsightsProps {
-  questionAnswerPairs: QuestionAnswerPair[] 
+  questionAnswerPairs: QuestionAnswerPair[];
 }
 export interface Insight {
-  type: "good" | "bad"
-  insight: string
+  type: "good" | "bad";
+  insight: string;
 }
 export default function InterviewInsights({
   questionAnswerPairs,
 }: InterviewInsightsProps) {
   const [questionIndex, setQuestionIndex] = useState(0);
-  const {isLoading: insightsLoading, data: insights, isError} = useQuery(
-    {
-      queryKey: [
-        "insights",
-        questionAnswerPairs
-      ], 
-      queryFn: async ({queryKey}) => {
-        const qaPairs = queryKey[1] as QuestionAnswerPair[]
-        const insights = await Promise.all(
-          qaPairs.map(qa => insightFetcher.getQAInsight(qa.question.questionPrompt, qa.answer))
-        ) 
-        return insights
-      },
-      refetchOnWindowFocus: false
+  const {
+    isLoading: insightsLoading,
+    data: insights,
+    isError,
+  } = useQuery({
+    queryKey: ["insights", questionAnswerPairs],
+    queryFn: async ({ queryKey }) => {
+      const qaPairs = queryKey[1] as QuestionAnswerPair[];
+      const insights = await Promise.all(
+        qaPairs.map((qa) =>
+          insightFetcher.getQAInsight(qa.question.questionPrompt, qa.answer)
+        )
+      );
+      return insights;
     },
-  )
+    refetchOnWindowFocus: false,
+  });
 
   const question = useMemo(() => {
     if (!questionAnswerPairs || questionAnswerPairs.length == 0) {
@@ -65,16 +68,16 @@ export default function InterviewInsights({
 
   const nextInsight = () => {
     if (questionIndex >= questionAnswerPairs.length - 1) {
-      return
+      return;
     }
-    setQuestionIndex(questionIndex + 1)
-  }
+    setQuestionIndex(questionIndex + 1);
+  };
   const prevInsight = () => {
     if (questionIndex <= 0) {
-      return 
+      return;
     }
-    setQuestionIndex(questionIndex - 1)
-  }
+    setQuestionIndex(questionIndex - 1);
+  };
 
   return (
     <div className="flex flex-col items-center md:overflow-hidden justify-between p-8 h-full">
@@ -104,19 +107,21 @@ export default function InterviewInsights({
           </h1>
           <hr className="-mx-6 border-y-2 border-indigo-500" />
           <div className="grid grid-cols-1 gap-2">
-            {
-              insightsLoading && <div className='grid grid-cols-[40px_1fr] gap-2'>
-                <Skeleton className="w-full aspect-square bg-gray-200"/>
-                <Skeleton className="h-20 bg-gray-200"/>
-                <Skeleton className="w-full aspect-square bg-gray-200"/>
-                <Skeleton className="h-full bg-gray-200"/>
+            {insightsLoading && (
+              <div className="grid grid-cols-[40px_1fr] gap-2">
+                <Skeleton className="w-full aspect-square bg-gray-200" />
+                <Skeleton className="h-20 bg-gray-200" />
+                <Skeleton className="w-full aspect-square bg-gray-200" />
+                <Skeleton className="h-full bg-gray-200" />
               </div>
-            }
-            {!insightsLoading && insights && insights[questionIndex].map(ins => 
-              <InsightComponent type={ins.type} key={uuid()}>
-                {ins.insight}
-              </InsightComponent>
             )}
+            {!insightsLoading &&
+              insights &&
+              insights[questionIndex].map((ins) => (
+                <InsightComponent type={ins.type} key={uuid()}>
+                  {ins.insight}
+                </InsightComponent>
+              ))}
             {isError && <div>error</div>}
           </div>
         </div>
@@ -130,7 +135,7 @@ export default function InterviewInsights({
           <IconInfoCircle />
         </IconButton>
         <IconButton onClick={nextInsight}>
-          <IconArrowRight/>
+          <IconArrowRight />
         </IconButton>
       </div>
     </div>
@@ -153,7 +158,9 @@ function InsightComponent({ type, children }: InsightComponentProps) {
   return (
     <div className="flex rounded-md w-full overflow-hidden items-start shadow">
       <div className={`shrink-0 p-2 w-fit h-full ${bgClasses}`}>{icon}</div>
-      <div className="p-2 text-gray-800 bg-gray-50 h-full w-full">{children}</div>
+      <div className="p-2 text-gray-800 bg-gray-50 h-full w-full">
+        {children}
+      </div>
     </div>
   );
 }

@@ -1,12 +1,10 @@
 import {
   IconArrowForward,
-  IconCircle,
   IconCircleFilled,
   IconKeyboard,
   IconMicrophone,
 } from "@tabler/icons-react";
 import IconButton from "./ui-kit/IconButton";
-import { useReactMediaRecorder } from "react-media-recorder";
 interface AnswerControlsProps {
   onSubmitClick?: () => void;
   onKeyboardClick?: () => void;
