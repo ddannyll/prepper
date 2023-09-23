@@ -44,7 +44,7 @@ model QuestionType {
 
     number Int
 
-    application Application @relation(fields: [applicationId], references: [id])
+    application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
     applicationId String
 }
 

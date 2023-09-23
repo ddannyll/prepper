@@ -96,6 +96,11 @@ func newFiberServer(
 		authMiddleware.AuthenticateRoute,
 		applicationHandler.GetAIQuestions,
 	)
+	applicationGroup.Delete(
+		"/",
+		authMiddleware.AuthenticateRoute,
+		applicationHandler.ApplicationDelete,
+	)
 
 	AIGroup := app.Group("/ai")
 	AIGroup.Get("/getQuestions", authMiddleware.AuthenticateRoute, aiHandler.GetQuestions)

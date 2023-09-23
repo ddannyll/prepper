@@ -79,6 +79,11 @@ definitions:
       question:
         type: string
     type: object
+  handlers.ApplicationDeleteRequest:
+    properties:
+      id:
+        type: string
+    type: object
   handlers.ApplicationQuestionResponse:
     properties:
       questions:
@@ -219,6 +224,31 @@ paths:
       summary: convert voice to text
       tags:
       - ai
+  /application:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: Application
+        in: body
+        name: ApplicationDeleteRequest
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.ApplicationDeleteRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+      summary: Delete a user's application
+      tags:
+      - application
   /application/:applicationId/questions:
     get:
       parameters:

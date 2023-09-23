@@ -118,6 +118,45 @@ const docTemplate = `{
                 }
             }
         },
+        "/application": {
+            "delete": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "application"
+                ],
+                "summary": "Delete a user's application",
+                "parameters": [
+                    {
+                        "description": "Application",
+                        "name": "ApplicationDeleteRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ApplicationDeleteRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                }
+            }
+        },
         "/application/:applicationId/questions": {
             "get": {
                 "produces": [
@@ -498,6 +537,14 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "question": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers.ApplicationDeleteRequest": {
+            "type": "object",
+            "properties": {
+                "id": {
                     "type": "string"
                 }
             }

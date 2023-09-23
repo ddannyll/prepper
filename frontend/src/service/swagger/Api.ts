@@ -56,6 +56,10 @@ export interface HandlersAnalysisRequest {
   question?: string;
 }
 
+export interface HandlersApplicationDeleteRequest {
+  id?: string;
+}
+
 export interface HandlersApplicationQuestionResponse {
   questions?: HandlersQuestionType[];
 }
@@ -389,6 +393,25 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
       }),
   };
   application = {
+    /**
+     * No description
+     *
+     * @tags application
+     * @name ApplicationDelete
+     * @summary Delete a user's application
+     * @request DELETE:/application
+     * @secure
+     */
+    applicationDelete: (ApplicationDeleteRequest: HandlersApplicationDeleteRequest, params: RequestParams = {}) =>
+      this.request<void, void>({
+        path: `/application`,
+        method: "DELETE",
+        body: ApplicationDeleteRequest,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+
     /**
      * No description
      *
