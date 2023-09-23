@@ -9,7 +9,8 @@ import { backendAPI } from "@/service/API";
 import Button from "@/components/ui-kit/Button";
 import { useState } from "react";
 import BeatLoader from "react-spinners/BeatLoader";
-import { cn } from "@/lib/utils";
+import { cn, getErrorMessage } from "@/lib/utils";
+import toast from "react-hot-toast";
 
 type LoginInputs = {
   username: string;
@@ -41,8 +42,8 @@ export default function Login() {
         localStorage.setItem("token", res.data.access_token as string);
         router.push("applications");
       }
-    } catch {
-      console.error("failed to login");
+    } catch (err) {
+      toast.error(getErrorMessage(err));
     }
     setLoading(false);
   };
