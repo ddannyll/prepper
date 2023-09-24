@@ -9,7 +9,7 @@ import {
   IconX,
 } from "@tabler/icons-react";
 import { cn } from "@/lib/utils";
-import { HTTPApplicatonFetcher } from "@/service/aplicationFetcher";
+import { HTTPApplicatonFetcher } from "@/service/applicationFetcher";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/router";
 import Link from "next/link";

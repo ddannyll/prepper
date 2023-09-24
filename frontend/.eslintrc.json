@@ -12,7 +12,6 @@
     "plugin:storybook/recommended"
   ],
   "rules": {
-    "indent": ["error", 2],
     "react/self-closing-comp": "error",
     "no-unused-vars": "off", // or "@typescript-eslint/no-unused-vars": "off",
     "unused-imports/no-unused-imports": "error",

@@ -4,7 +4,7 @@ import Button from "@/components/ui-kit/Button";
 import QuestionTypeWithTags from "@/components/QuestionTypeWithTags";
 import { useState } from "react";
 import { v4 as uuid } from "uuid";
-import { HTTPApplicatonFetcher } from "@/service/aplicationFetcher";
+import { HTTPApplicatonFetcher } from "@/service/applicationFetcher";
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/router";
 import BeatLoader from "react-spinners/BeatLoader";
