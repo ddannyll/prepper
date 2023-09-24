@@ -70,7 +70,7 @@ export default function QuestionTypeWithTags({
       </div>
       <hr />
       <Popover>
-        <PopoverTrigger className="flex items-center gap-2 100 p-2 rounded-md text-sm hover:bg-gray-100 rounded-md">
+        <PopoverTrigger className="flex items-center gap-2 100 p-2 rounded-md text-sm hover:bg-gray-100">
           <IconTag className="w-5 h-5" />
           New Tag
         </PopoverTrigger>

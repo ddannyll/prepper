@@ -59,7 +59,7 @@ func (u *UserHandler) SignUpUser(c *fiber.Ctx) error {
 
 	hashedPassword, err := hashPassword(user.Password)
 	if err != nil {
-		return fiber.NewError(fiber.StatusBadRequest, "invalid password")
+		return c.Status(fiber.StatusBadRequest).JSON("Invalid password")
 	}
 
 	createdUser, createError := u.dbClient.User.CreateOne(
@@ -68,7 +68,7 @@ func (u *UserHandler) SignUpUser(c *fiber.Ctx) error {
 	).Exec(c.Context())
 
 	if createError != nil {
-		return createError
+		return c.Status(fiber.StatusBadRequest).JSON("Username is already taken.")
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
@@ -78,9 +78,7 @@ func (u *UserHandler) SignUpUser(c *fiber.Ctx) error {
 
 	tokenString, err := token.SignedString([]byte(u.jwtSecret))
 	if err != nil {
-
-		log.Println(err)
-		return fiber.NewError(fiber.StatusUnauthorized, "invalid username and/or password")
+		return err
 	}
 
 	return c.JSON(userSigninSuccessResponse{
@@ -108,25 +106,6 @@ func (u *UserHandler) SignInUser(c *fiber.Ctx) error {
 
 	userFromDB, err := u.dbClient.User.FindUnique(db.User.Username.Equals(user.Username)).
 		Exec(c.Context())
-	// if err != nil {
-	//
-	// 	// if user is daniel, create him
-	// 	if user.Username == "daniel" || user.Username == "neosh" {
-	//
-	// 		u.dbClient.User.CreateOne(
-	// 			db.User.Username.Set(user.Username),
-	// 		).Exec(c.Context())
-	//
-	// 		// return the user
-	// 		userFromDB, err = u.dbClient.User.FindUnique(db.User.Username.Equals(user.Username)).Exec(c.Context())
-	// 		if err != nil {
-	// 			return err
-	// 		}
-	// 	} else {
-	// 		return fiber.NewError(fiber.StatusUnauthorized, "incorrect login")
-	// 	}
-	//
-	// }
 	if err != nil || !checkPasswordHash(user.Password, userFromDB.HashedPassword) {
 		return fiber.NewError(fiber.StatusUnauthorized, "invalid username and/or password")
 	}

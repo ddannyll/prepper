@@ -5,19 +5,18 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/ddannyll/prepper/pkg/config"
-	"github.com/ddannyll/prepper/pkg/dbconnection"
-	"github.com/ddannyll/prepper/pkg/service"
-
-	_ "github.com/ddannyll/prepper/docs"
-	"github.com/ddannyll/prepper/pkg/handlers"
-	"github.com/ddannyll/prepper/pkg/storage"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/swagger"
-
 	"go.uber.org/fx"
+
+	_ "github.com/ddannyll/prepper/docs"
+	"github.com/ddannyll/prepper/pkg/config"
+	"github.com/ddannyll/prepper/pkg/dbconnection"
+	"github.com/ddannyll/prepper/pkg/handlers"
+	"github.com/ddannyll/prepper/pkg/service"
+	"github.com/ddannyll/prepper/pkg/storage"
 )
 
 // @title			prepper API
@@ -50,11 +49,11 @@ func newFiberServer(
 			// we just send that back normally
 			var e *fiber.Error
 			if errors.As(err, &e) {
-				return ctx.Status(e.Code).SendString(e.Error())
+				return ctx.Status(e.Code).JSON(e.Error())
 			}
 
 			// Otherwise send Internal Server Error
-			return ctx.Status(fiber.StatusInternalServerError).SendString("Internal Server Error")
+			return ctx.Status(fiber.StatusInternalServerError).JSON("Internal Server Error")
 		},
 	})
 
@@ -82,9 +81,26 @@ func newFiberServer(
 	// applicationGroup.Post("/create", authMiddleware.AuthenticateRoute, applicationHandler.ApplicationCreate)
 
 	applicationGroup.Get("/me", authMiddleware.AuthenticateRoute, applicationHandler.ApplicationMe)
-	applicationGroup.Post("/create", authMiddleware.AuthenticateRoute, applicationHandler.ApplicationCreate)
-	applicationGroup.Get("/:applicationId/questions", authMiddleware.AuthenticateRoute, applicationHandler.ApplicationQuestions)
-	applicationGroup.Get("/:applicationId/questions/generate", authMiddleware.AuthenticateRoute, applicationHandler.GetAIQuestions)
+	applicationGroup.Post(
+		"/create",
+		authMiddleware.AuthenticateRoute,
+		applicationHandler.ApplicationCreate,
+	)
+	applicationGroup.Get(
+		"/:applicationId/questions",
+		authMiddleware.AuthenticateRoute,
+		applicationHandler.ApplicationQuestions,
+	)
+	applicationGroup.Get(
+		"/:applicationId/questions/generate",
+		authMiddleware.AuthenticateRoute,
+		applicationHandler.GetAIQuestions,
+	)
+	applicationGroup.Delete(
+		"/",
+		authMiddleware.AuthenticateRoute,
+		applicationHandler.ApplicationDelete,
+	)
 
 	AIGroup := app.Group("/ai")
 	AIGroup.Get("/getQuestions", authMiddleware.AuthenticateRoute, aiHandler.GetQuestions)

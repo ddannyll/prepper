@@ -48,20 +48,21 @@ type ApplicationCreateSuccessResponse struct {
 
 // CreateApplication godoc
 //
-//	@Summary		Create an application for the user
-//	@description	an application has some properties
-//	@Tags			application
-//	@Accept			json
-//	@Param			ApplicationCreateBody	body ApplicationCreateBody true "Application"
-//	@Produce		json
-//	@Success		200	{object} ApplicationCreateSuccessResponse
-//	@Router			/application/create [post]
+//		@Summary		Create an application for the user
+//		@description	an application has some properties
+//		@Tags			application
+//		@Accept			json
+//		@Param			ApplicationCreateBody	body ApplicationCreateBody true "Application"
+//		@Produce		json
+//		@Success		200	{object} ApplicationCreateSuccessResponse
+//	 @Failure    400 "failed to create app"
+//		@Router			/application/create [post]
 func (u *ApplicationHandler) ApplicationCreate(c *fiber.Ctx) error {
 	userID := c.Locals("userID").(string)
 
 	var application ApplicationCreateBody
 	if err := parseAndValidateBody(c, &application); err != nil {
-		return err
+		return c.Status(fiber.StatusBadRequest).JSON(err)
 	}
 
 	createdApplication, createError := u.dbClient.Application.CreateOne(
@@ -123,12 +124,6 @@ func (u *ApplicationHandler) ApplicationMe(c *fiber.Ctx) error {
 		return fiber.ErrUnauthorized
 	}
 
-	// applications, fetchError := u.dbClient.Application.FindMany(
-	// 	db.Application.Owner.Where(
-	// 		db.User.ID.Equals(userID),
-	// 	),
-	// ).Exec(c.Context())
-
 	// find many order by created at desc
 	applications, fetchError := u.dbClient.Application.FindMany(
 		db.Application.Owner.Where(
@@ -145,6 +140,41 @@ func (u *ApplicationHandler) ApplicationMe(c *fiber.Ctx) error {
 	resp := applications
 
 	return c.JSON(resp)
+}
+
+type ApplicationDeleteRequest struct {
+	Id string `json:"id"`
+}
+
+// ApplicationMe godoc
+//
+//		@Summary Delete a user's application
+//		@description
+//		@Tags		application
+//	  @Accept json
+//		@Param			ApplicationDeleteRequest	body ApplicationDeleteRequest true "Application"
+//		@Produce	json
+//		@Success	200
+//		@Failure	401
+//		@Failure	403
+//		@Failure	400
+//		@Router		/application [delete]
+func (u *ApplicationHandler) ApplicationDelete(c *fiber.Ctx) error {
+	userId := c.Locals("userID").(string)
+	if userId == "" {
+		return fiber.ErrUnauthorized
+	}
+
+	req := ApplicationDeleteRequest{}
+	c.BodyParser(&req)
+	deleted, err := u.dbClient.Application.FindUnique(
+		db.Application.ID.Equals(req.Id),
+	).Delete().Exec(c.Context())
+	log.Println(deleted)
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, err.Error())
+	}
+	return nil
 }
 
 type QuestionType struct {
