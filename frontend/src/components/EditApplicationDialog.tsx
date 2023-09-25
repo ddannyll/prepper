@@ -32,6 +32,7 @@ export default function EditApplicationDialog({
   const { isLoading, mutate } = useMutation({
     mutationFn: () => applicationFetcher.deleteApplication(id),
     onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey: ["todos"] });
       const prevApplicaitons = queryClient.getQueryData<string[]>([
         "applications",
       ]);
