@@ -33,15 +33,15 @@ export default function EditApplicationDialog({
     mutationFn: () => applicationFetcher.deleteApplication(id),
     onMutate: async () => {
       await queryClient.cancelQueries({ queryKey: ["todos"] });
-      const prevApplicaitons = queryClient.getQueryData<string[]>([
+      const prevApplications = queryClient.getQueryData<string[]>([
         "applications",
       ]);
-      console.log(prevApplicaitons);
+      console.log(prevApplications);
       queryClient.setQueryData<DbInnerApplication[]>(["applications"], (old) =>
         [...(old || [])].filter((app) => app.id !== id)
       );
       router.push("/applications");
-      return { prevApplicaitons };
+      return { prevApplicaitons: prevApplications };
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["applications"] });
