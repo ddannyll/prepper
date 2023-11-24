@@ -10,6 +10,9 @@ cd backend
 
 
 # --- Perform database migration ---
+rm db/query-engine-*
+rm db/db_gen.go
+
 go run github.com/steebchen/prisma-client-go db push
 
 nodemon -e go --signal SIGTERM --exec 'go' run . &
