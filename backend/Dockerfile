@@ -15,8 +15,6 @@ ENV PORT=8080
 
 EXPOSE 8080
 
-RUN go run github.com/steebchen/prisma-client-go db push
-
 RUN go build -o bin .
 
 ENTRYPOINT [ "/app/bin" ]
