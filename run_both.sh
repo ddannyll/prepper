@@ -13,8 +13,6 @@ cd backend
 rm db/query-engine-*
 rm db/db_gen.go
 
-go run github.com/steebchen/prisma-client-go db push
-
 nodemon -e go --signal SIGTERM --exec 'go' run . &
 
 cd ../frontend
